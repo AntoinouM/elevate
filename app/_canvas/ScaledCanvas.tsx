@@ -22,10 +22,6 @@ const ScaledCanvas: React.FC = () => {
 
     // Scale the canvas context to make drawing consistent
     context.scale(dpr, dpr);
-
-    // Example: Drawing a rectangle
-    context.fillStyle = 'blue';
-    context.fillRect(10, 10, 100, 50);
   }, []);
 
   return <canvas ref={canvasRef} className={canvas.main} />;
