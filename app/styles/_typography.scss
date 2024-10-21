@@ -1,0 +1,122 @@
+@font-face {
+  font-family: 'Montserrat';
+  font-style: NORMAL;
+  font-weight: 400;
+  src: url('../fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: NORMAL;
+  font-weight: 700;
+  src: url('../fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+}
+
+* {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.display1 {
+  font-weight: 400;
+  font-size: 4.235em;
+  line-height: 1.129;
+  letter-spacing: -0.022;
+}
+
+.display1 {
+  font-weight: 400;
+  font-size: 2.618em;
+  line-height: 1.272;
+  letter-spacing: -0.022;
+}
+
+.title1 {
+  font-weight: 400;
+  font-size: 2.058em;
+  line-height: 1.272;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.title2 {
+  font-weight: 400;
+  font-size: 1.618em;
+  line-height: 1.272;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.title3 {
+  font-weight: 400;
+  font-size: 1.272em;
+  line-height: 1.272;
+  letter-spacing: -0.017;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.title4 {
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.272;
+  letter-spacing: -0.017;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.heading {
+  font-weight: 600;
+  font-size: 1.129em;
+  line-height: 1.272;
+  letter-spacing: -0.014;
+}
+
+.subheading {
+  font-weight: 400;
+  font-size: 0.085em;
+  line-height: 1.272;
+  letter-spacing: -0.007;
+}
+
+.body {
+  font-weight: 400;
+  font-size: 0.8em;
+  line-height: 1.618;
+  letter-spacing: -0.011;
+}
+
+@mixin font-classes($sizes, $line-height) {
+  @each $index, $size in $sizes {
+    h#{$index},
+    .h#{$index} {
+      font-weight: bold;
+      font-size: $size;
+      line-height: map-get($line-height, $index);
+    }
+
+    .p#{$index} {
+      font-weight: normal;
+      font-size: $size;
+      line-height: map-get($line-height, $index);
+    }
+  }
+
+  * {
+    font-family: 'Montserrat', sans-serif;
+    font-size: map-get($sizes, 5);
+    line-height: map-get($line-height, 5);
+  }
+}
+
+// Mobile
+@include font-classes($font-size-phone, $line-height-phone);
+
+// Tablets
+@media (min-width: map-get($breakpoints, md)) {
+  @include font-classes($font-size-tablet, $line-height-tablet);
+}
+
+// Desktop
+@media (min-width: map-get($breakpoints, lg)) {
+  @include font-classes($font-size-desktop, $line-height-desktop);
+}

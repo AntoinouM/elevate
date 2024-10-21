@@ -1,0 +1,15 @@
+@use 'sass:map';
+
+// media-query
+@mixin breakpoint-max-width($key) {
+  $size: map-get($breakpoints, $key);
+
+  @if ($size) {
+    /* On screens that are $size or less */
+    @media only screen and (max-width: $size) {
+      @content;
+    }
+  } @else {
+    @error '`#{$key}` does not exist in the $breakpoints';
+  }
+}

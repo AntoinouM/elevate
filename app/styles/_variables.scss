@@ -1,0 +1,129 @@
+@use 'sass:map';
+/* COLORS */
+
+// black & white
+$grey-100: #000000;
+$grey-90: #272727;
+$grey-80: #3d3c3e;
+$grey-70: #707070;
+$grey-60: #b8b8b8;
+$grey-50: #d6d6d6;
+$grey-40: #ebebeb;
+$grey-30: #f5f5f5;
+$grey-0: #ffffff;
+$white: $grey-0;
+$black: #161616;
+
+// color palette
+$celeste-blue: #b7fdfe;
+$smoky-black: #171512;
+$lapis-blue: #2a88ad;
+$electric-blue: #3fc9ff;
+$smoke-white: #f5f5f5;
+
+// basic ordering
+$primary: $celeste-blue;
+$secondary: $black;
+
+/* FONT */
+
+// size
+$font-size-desktop: (
+  1: 56px,
+  2: 48px,
+  3: 32px,
+  4: 24px,
+  5: 18px,
+);
+
+$font-size-tablet: (
+  1: 48px,
+  2: 32px,
+  3: 24px,
+  4: 18px,
+  5: 16px,
+);
+
+$font-size-phone: (
+  1: 24px,
+  2: 20px,
+  3: 18px,
+  4: 16px,
+  5: 14px,
+);
+
+// line height
+$line-height-desktop: (
+  1: 1.1,
+  2: 1.2,
+  3: 1.2,
+  4: 1.2,
+  5: 1.2,
+);
+
+$line-height-tablet: (
+  1: 1.1,
+  2: 1.2,
+  3: 1.2,
+  4: 1.2,
+  5: 1.2,
+);
+
+$line-height-phone: (
+  1: 1.2,
+  2: 1.2,
+  3: 1.2,
+  4: 1.2,
+  5: 1.2,
+);
+
+// Spacer
+$spacer-1: 4px;
+$spacer-2: 8px;
+$spacer-3: 16px;
+$spacer-4: 24px;
+$spacer-5: 32px;
+$spacer-6: 40px;
+$spacer-7: 48px;
+$spacer-8: 56px;
+$spacer-9: 64px;
+$spacer-10: 72px;
+$spacer-11: 80px;
+
+$spacer: $spacer-1;
+$spacers: (
+  0: 0,
+  1: $spacer-1,
+  2: $spacer-2,
+  3: $spacer-3,
+  4: $spacer-4,
+  5: $spacer-5,
+  6: $spacer-6,
+  7: $spacer-7,
+  8: $spacer-8,
+  9: $spacer-9,
+);
+
+// Border
+$border-radius: 4px;
+$border-radius-lg: 8px;
+$border-radius-xl: 16px;
+
+$border-width: 1px;
+$border-width-lg: 2px;
+
+$box-shadow-top-right: 3px -3px 2px $grey-40;
+$box-shadow-right: 3px 0px 2px $grey-40;
+
+/* BREAKPOINTS */
+$breakpoints: (
+  xs: 365px,
+  s: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+);
+// @debug map.get($breakpoints, "s"); => 576
+
+/* IMPORTS */
+@import 'mixins';
