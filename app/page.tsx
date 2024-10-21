@@ -1,9 +1,9 @@
-import styles from './styles/page.module.scss';
+import ScaledCanvas from './_canvas/ScaledCanvas';
 
 export default function Home() {
   return (
     <>
-      <h1 className={styles.main}>Hello world</h1>
+      <ScaledCanvas />
     </>
   );
 }
