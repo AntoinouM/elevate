@@ -107,7 +107,6 @@ class Game {
         y: mouseEvent.clientY,
       };
     }
-    console.log(this.pointerPosition.x);
   }
 }
 
