@@ -36,7 +36,9 @@ class GameObject {
   init(context: CanvasRenderingContext2D) {
     console.log(context);
   }
-  update() {}
+  update(timeStamp: number) {
+    console.log(timeStamp);
+  }
   render() {}
 
   getBoundingBox(): object {

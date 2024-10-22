@@ -45,9 +45,10 @@ const ScaledCanvas: React.FC = () => {
 
     // Initialize the game
     const game = new Game(canvas, context);
-    const player = new Player(60, 80, 60, 600);
+    const player = new Player(50, 50, 10, 600);
     game.addObject(player);
     game.init();
+    //game.start();
 
     // Clean up the event listener on unmount
     return () => {
