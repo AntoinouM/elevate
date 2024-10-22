@@ -33,13 +33,11 @@ class GameObject {
     return this._id;
   }
 
-  init(context: CanvasRenderingContext2D) {
-    console.log(context);
+  init(context: CanvasRenderingContext2D) {}
+  update(timeStamp: number) {}
+  render(context: CanvasRenderingContext2D) {
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   }
-  update(timeStamp: number) {
-    console.log(timeStamp);
-  }
-  render() {}
 
   getBoundingBox(): object {
     return {

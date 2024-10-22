@@ -1,3 +1,4 @@
+import { time } from 'console';
 import GameObject from './GameObject';
 
 class Game {
@@ -6,8 +7,13 @@ class Game {
   _context;
   _gameObjects = new Map<string, GameObject>();
   _lastTickTimestamp = 0;
+  _debug = false;
 
-  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    canvasDimension: object
+  ) {
     this._canvas = canvas;
     this._context = context;
     this._state = 0;
@@ -61,7 +67,16 @@ class Game {
     });
   }
 
-  render(): void {}
+  render(context: CanvasRenderingContext2D): void {
+    if (this._debug) {
+      this.gameObjects.forEach((value) => {
+        value.getBoundingBox();
+      });
+    }
+    this.gameObjects.forEach((value) => {
+      value.render(context);
+    });
+  }
 
   start(): void {
     // kick off first iteration of render()
@@ -76,8 +91,7 @@ class Game {
       performance.now() - this.lastTickTimestamp;
 
     this.update(timePassedSinceLastRender);
-    // render();
-
+    this.render(this.context);
     this.lastTickTimestamp = performance.now();
 
     // call next iteration

@@ -6,10 +6,12 @@ interface Position {
 }
 
 class Player extends GameObject {
-  _dx: number = 0;
+  _dx: number = 1;
   _dy: number = 0;
-  _velocity: number = 0;
+  _velocity: number = 0.02;
   _pointerPosition: Position;
+  _pointerMaxDistance = 450;
+  _pointerDistance = 0;
 
   constructor(width: number, height: number, x: number, y: number) {
     super(width, height, x, y);
@@ -32,33 +34,102 @@ class Player extends GameObject {
   init(context: CanvasRenderingContext2D): void {
     context.fillStyle = 'pink';
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
-
     // trigger mouse detection
     window.addEventListener('mousemove', this.handlePointer);
     window.addEventListener('touchmove', this.handlePointer);
   }
 
   update(timeStamp: number): void {
-    console.log('from player: ' + timeStamp);
+    this._dx = this.checkDirection();
+    this.movePlayer(timeStamp);
   }
-  render(): void {}
+  render(context: CanvasRenderingContext2D): void {
+    super.render(context);
+    context.save();
+    // super.render(context);
+    context.translate(this.position.x, this.position.y);
+    // flip the image if we're moving to the left
+    context.scale(this._dx, 1);
 
-  handlePointer(event: MouseEvent | TouchEvent) {
+    // draw player
+    context.fillStyle = 'green';
+    context.fillRect(
+      -this.width / 2,
+      -this.height / 2,
+      this.width,
+      this.height
+    );
+
+    context.restore();
+  }
+
+  handlePointer = (event: MouseEvent | TouchEvent): void => {
     if (event.type.includes('touch')) {
-      // TypeScript now knows this is a TouchEvent
       const touchEvent = event as TouchEvent;
       this.pointerPosition = {
         x: touchEvent.touches[0].pageX,
         y: touchEvent.touches[0].pageY,
       };
     } else if (event.type.includes('mouse')) {
-      // TypeScript now knows this is a MouseEvent
       const mouseEvent = event as MouseEvent;
       this.pointerPosition = {
         x: mouseEvent.clientX,
         y: mouseEvent.clientY,
       };
     }
+  };
+
+  movePlayer = (timeStamp: number): void => {
+    // changing x in regard of the mouse position
+    if (this.pointerPosition.x <= this.position.x) {
+      if (
+        Math.floor(this.position.x - this.pointerPosition.x) <
+        this._pointerMaxDistance
+      ) {
+        this._pointerDistance = Math.floor(
+          this.position.x - this.pointerPosition.x
+        );
+      } else {
+        this._pointerDistance = this._pointerMaxDistance;
+      }
+    } else if (this.pointerPosition.x > this.position.x) {
+      if (
+        Math.floor(this.pointerPosition.x - this.position.x) <
+        this._pointerMaxDistance
+      ) {
+        this._pointerDistance = Math.floor(
+          this._pointerPosition.x - this.position.x
+        );
+      } else {
+        this._pointerDistance = this._pointerMaxDistance;
+      }
+    }
+    // movement implementation
+    // changing this.x regarding the distance with the mouse
+    this.position.x +=
+      timeStamp * this._dx * this._velocity * (this._pointerDistance / 10);
+    // create a variable to influence the falling speed if too close to the top
+    // y movement with simplified Euleur algorythm
+    // vertical velocity
+    // vertical position
+    // ground check
+    // verticalForce input if contact with clouds
+    // boundaries checking
+    // check for right boundary
+    if (this.position.x > 390) this.position.x = 390;
+    // check for left boundary
+    if (this.position.x < 0) this.position.x = 0;
+    // check for top boundary
+    //if (this.y <= 0) this.y = 0;
+    // define the state variable in regard of mouse distance and if on the ground
+  };
+
+  getBoundingBox(): object {
+    return super.getBoundingBox();
+  }
+
+  checkDirection(): -1 | 1 {
+    return Math.floor(this.pointerPosition.x) < this.position.x ? -1 : 1;
   }
 }
 

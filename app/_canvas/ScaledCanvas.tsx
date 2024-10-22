@@ -32,7 +32,7 @@ const ScaledCanvas: React.FC = () => {
     const context = canvas.getContext('2d');
     if (!context) return; // TypeScript safety check
 
-    const updateDimension = () => {
+    const updateDimension = (): void => {
       widthRef.current = canvas.clientWidth;
       heightRef.current = canvas.clientHeight;
       setupCanvas(canvas, context, widthRef.current, heightRef.current);
@@ -44,11 +44,14 @@ const ScaledCanvas: React.FC = () => {
     window.addEventListener('resize', updateDimension);
 
     // Initialize the game
-    const game = new Game(canvas, context);
-    const player = new Player(50, 50, 10, 600);
+    const game = new Game(canvas, context, {
+      width: widthRef,
+      height: heightRef,
+    });
+    const player = new Player(50, 50, canvas.clientWidth / 2, 600);
     game.addObject(player);
     game.init();
-    //game.start();
+    game.start();
 
     // Clean up the event listener on unmount
     return () => {
