@@ -12,7 +12,6 @@ class Player extends GameObject {
   init(context: CanvasRenderingContext2D) {
     context.fillStyle = 'pink';
     context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    console.log('player init');
   }
 }
 

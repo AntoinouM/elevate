@@ -7,30 +7,52 @@ import Player from '../utils/classes/Player';
 
 const ScaledCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const widthRef = useRef<number>(0);
+  const heightRef = useRef<number>(0);
+
+  const setupCanvas = (
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    width: number,
+    height: number
+  ): void => {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    context.scale(dpr, dpr); // Scale the canvas context
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
+
     if (!canvas) return; // TypeScript safety check
 
     const context = canvas.getContext('2d');
     if (!context) return; // TypeScript safety check
 
-    const dpr = window.devicePixelRatio || 1;
+    const updateDimension = () => {
+      widthRef.current = canvas.clientWidth;
+      heightRef.current = canvas.clientHeight;
+      setupCanvas(canvas, context, widthRef.current, heightRef.current);
+    };
 
-    // Set the canvas size based on devicePixelRatio
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    updateDimension(); // Set initial dimensions
 
-    // Scale the canvas context to make drawing consistent
-    context.scale(dpr, dpr);
+    // Set up resize event listener
+    window.addEventListener('resize', updateDimension);
 
-    // declare the game
+    // Initialize the game
     const game = new Game(canvas, context);
-    const player = new Player(100, 100, 40, 40);
+    const player = new Player(60, 80, 60, 600);
     game.addObject(player);
-
     game.init();
+
+    // Clean up the event listener on unmount
+    return () => {
+      window.removeEventListener('resize', updateDimension);
+    };
   }, []);
 
   return <canvas ref={canvasRef} className={canvas.main} />;

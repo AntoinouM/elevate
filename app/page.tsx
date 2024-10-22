@@ -3,7 +3,9 @@ import ScaledCanvas from './_canvas/ScaledCanvas';
 export default function Home() {
   return (
     <>
-      <ScaledCanvas />
+      <div className="canvas__container">
+        <ScaledCanvas />
+      </div>
     </>
   );
 }

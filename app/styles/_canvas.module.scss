@@ -1,7 +1,12 @@
 .main {
   width: 100%;
-  max-width: 600px;
+  max-width: 550px;
   height: 100vh;
-  max-height: 900px;
+  max-height: 650px;
   background-color: $night-blue;
+
+  @include breakpoint-max-width(md) {
+    max-height: 100vh;
+    max-width: 100%;
+  }
 }
