@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef } from 'react';
 import canvas from '@styles/_canvas.module.scss';
+import Game from '../utils/classes/Game';
+import Player from '../utils/classes/Player';
 
 const ScaledCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -22,6 +24,13 @@ const ScaledCanvas: React.FC = () => {
 
     // Scale the canvas context to make drawing consistent
     context.scale(dpr, dpr);
+
+    // declare the game
+    const game = new Game(canvas, context);
+    const player = new Player(100, 100, 40, 40);
+    game.addObject(player);
+
+    game.init();
   }, []);
 
   return <canvas ref={canvasRef} className={canvas.main} />;

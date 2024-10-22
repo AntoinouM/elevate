@@ -33,6 +33,12 @@ class GameObject {
     return this._id;
   }
 
+  init(context: CanvasRenderingContext2D) {
+    console.log(context);
+  }
+  update() {}
+  render() {}
+
   getBoundingBox(): object {
     return {
       position: {
