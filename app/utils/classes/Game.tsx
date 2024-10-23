@@ -10,7 +10,7 @@ class Game {
   _lastTickTimestamp = 0;
   _debug = false;
   _collectiblesPool: GameObject[];
-  #config;
+  _config;
   _lastRenderTime: number;
   _player: Player | undefined;
 
@@ -19,7 +19,7 @@ class Game {
     this._context = context;
     this._state = 0;
     this._collectiblesPool = [];
-    this.#config = {
+    this._config = {
       HERO: {
         width: 50,
         height: 50,
@@ -32,6 +32,8 @@ class Game {
       fps: 60,
       fpsInterval: 1000 / 60,
       ground: this.canvas.clientHeight - 50 / 1.5,
+      gravity: -0.001,
+      impulseForce: 0.62,
     };
 
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
@@ -59,8 +61,8 @@ class Game {
   get collectiblesPool() {
     return this._collectiblesPool;
   }
-  protected get config() {
-    return this.#config;
+  get config() {
+    return this._config;
   }
   get player(): Player | undefined {
     return this._player;
@@ -125,7 +127,12 @@ class Game {
   }
 
   render(): void {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.clearRect(
+      0,
+      0,
+      this.canvas.clientWidth,
+      this.canvas.clientHeight
+    );
     if (this._debug) {
       this.gameObjects.forEach((value) => {
         value.getBoundingBox();

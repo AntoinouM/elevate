@@ -14,6 +14,7 @@ class Player extends GameObject {
   _pointerMaxDistance = 450;
   _pointerDistance = 0;
   _positionYPercent: number;
+  #verticalForce: number = 0;
 
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, x, y, game);
@@ -54,6 +55,16 @@ class Player extends GameObject {
     this.game.canvas.addEventListener('touchmove', (event) =>
       this.handlePointer(event, this.game.context.canvas)
     );
+    this.game.canvas.addEventListener('touchstart', (event) => {
+      if (this.position.y === this.game.config.ground) {
+        this.#verticalForce -= this.game.config.impulseForce;
+      }
+    });
+    this.game.canvas.addEventListener('mousedown', (event) => {
+      if (this.position.y === this.game.config.ground) {
+        this.#verticalForce -= this.game.config.impulseForce;
+      }
+    });
   }
 
   update(timeStamp: number): void {
@@ -122,9 +133,27 @@ class Player extends GameObject {
     return sourceToTargetDistance;
   }
 
-  updateYPosition(): number {
-    return 0;
+  updateYPosition(timeStamp: number): void {
+    // create a variable to influence the falling speed if too close to the top
+    let gravityDelta = 1;
+    if (
+      ((this.position.y + this.height) * 100) / this.game.canvas.clientHeight <
+      this.height / 2
+    ) {
+      gravityDelta =
+        1 +
+        this.game.canvas.clientHeight / (this.position.y + this.height) / 10;
+    } else {
+      gravityDelta = 1;
+    }
+    // y movement with simplified Euleur algorythm
+    // vertical velocity
+    this.#verticalForce -= this.game.config.gravity * timeStamp * gravityDelta;
+
+    this.position.y += this.#verticalForce * timeStamp;
   }
+
+  checkBoundaries() {}
 
   movePlayer = (timeStamp: number, canvas: HTMLCanvasElement): void => {
     // update X position
@@ -137,11 +166,15 @@ class Player extends GameObject {
     // movement implementation
     this.position.x +=
       timeStamp * this._dx * this._velocity * (this._pointerDistance / 10);
-    // create a variable to influence the falling speed if too close to the top
-    // y movement with simplified Euleur algorythm
-    // vertical velocity
-    // vertical position
+
+    // update Y position
+    this.updateYPosition(timeStamp);
+
     // ground check
+    if (this.position.y > this.game.config.ground) {
+      this.position.y = this.game.config.ground;
+      this.#verticalForce = 0;
+    }
     // verticalForce input if contact with clouds
     // boundaries checking
     // check for right boundary
@@ -150,8 +183,7 @@ class Player extends GameObject {
     // check for left boundary
     if (this.position.x < 0) this.position.x = 0;
     // check for top boundary
-    //if (this.y <= 0) this.y = 0;
-    // define the state variable in regard of mouse distance and if on the ground
+    if (this.position.y <= 0) this.position.y = 0;
   };
 
   getBoundingBox(): object {
