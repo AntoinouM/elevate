@@ -61,7 +61,6 @@ class Player extends GameObject {
     this.movePlayer(timeStamp, this.game.canvas);
   }
   render(): void {
-    super.render();
     this.game.context.save();
     // super.render(context);
     this.game.context.translate(this.position.x, this.position.y);

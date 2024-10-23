@@ -16,11 +16,11 @@ const ScaledCanvas: React.FC = () => {
     height: number
   ): void => {
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
-    context.scale(dpr, dpr); // Scale the canvas context
+    canvas.width = width * dpr; // Set the actual pixel width
+    canvas.height = height * dpr; // Set the actual pixel height
+    canvas.style.width = width + 'px'; // Set the style width
+    canvas.style.height = height + 'px'; // Set the style height
+    context.scale(dpr, dpr); // Scale the context for high-DPI displays
   };
 
   useEffect(() => {

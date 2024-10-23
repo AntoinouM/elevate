@@ -124,17 +124,18 @@ class Game {
   }
 
   render(): void {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     if (this._debug) {
       this.gameObjects.forEach((value) => {
         value.getBoundingBox();
       });
     }
-    this.gameObjects.forEach((value) => {
-      value.render();
-    });
     // Ensure you render the collectibles
     this.collectiblesPool.forEach((collectible) => {
       collectible.render(); // Call render for each planet
+    });
+    this.gameObjects.forEach((value) => {
+      value.render();
     });
   }
 

@@ -38,14 +38,7 @@ class GameObject {
 
   init(): void {}
   update(timeStamp: number): void {}
-  render(): void {
-    this.game.context.clearRect(
-      0,
-      0,
-      this.game.context.canvas.width,
-      this.game.context.canvas.height
-    );
-  }
+  render(): void {}
 
   draw(
     context: CanvasRenderingContext2D,

@@ -23,18 +23,15 @@ class Planet extends GameObject {
   init() {
     this.game.context.strokeStyle = 'pink';
     this.game.context.lineWidth = 1.5;
-    console.log('init');
   }
   update() {}
-  render() {
-    // draw planet
-    this.draw(
-      this.game.context,
-      this.position.x,
-      this.position.y,
-      this.width,
-      this.width
-    );
+  render(): void {
+    // Adjust the drawing coordinates to the scaled canvas dimensions
+    const scaledX = this.position.x / window.devicePixelRatio;
+    const scaledY = this.position.y / window.devicePixelRatio;
+
+    // Draw planet using adjusted positions
+    this.draw(this.game.context, scaledX, scaledY, this.width, this.height);
   }
 }
 
