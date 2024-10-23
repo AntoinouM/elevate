@@ -31,6 +31,7 @@ class Game {
       },
       fps: 60,
       fpsInterval: 1000 / 60,
+      ground: this.canvas.clientHeight - 50 / 1.5,
     };
 
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
@@ -92,7 +93,7 @@ class Game {
       this.config.HERO.width,
       this.config.HERO.height,
       this.canvas.clientWidth / 2,
-      600,
+      this.config.ground,
       this
     );
     this.addObject(this.player);
@@ -109,8 +110,8 @@ class Game {
       const planet = new Planet(
         this.config.PLANET.radius,
         this.config.PLANET.radius,
-        Math.random() * this.canvas.width, // X position within canvas width
-        Math.random() * (this.canvas.height - 80) + 40, // Random Y position for visibility
+        Math.random() * this.canvas.clientWidth, // X position within canvas width
+        Math.random() * this.canvas.clientHeight, // Random Y position for visibility
         this
       );
       this.collectiblesPool.push(planet);
