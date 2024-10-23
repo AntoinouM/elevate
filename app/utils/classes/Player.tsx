@@ -13,6 +13,7 @@ class Player extends GameObject {
   _pointerPosition: Position;
   _pointerMaxDistance = 450;
   _pointerDistance = 0;
+  _positionYPercent: number;
 
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, x, y, game);
@@ -20,6 +21,7 @@ class Player extends GameObject {
       x: 0,
       y: 0,
     };
+    this._positionYPercent = y / game.canvas.height;
   }
 
   // GETTERS
@@ -97,33 +99,43 @@ class Player extends GameObject {
     }
   };
 
-  movePlayer = (timeStamp: number, canvas: HTMLCanvasElement): void => {
-    // changing x in regard of the mouse position
-    if (this.pointerPosition.x <= this.position.x) {
-      if (
-        Math.floor(this.position.x - this.pointerPosition.x) <
-        this._pointerMaxDistance
-      ) {
-        this._pointerDistance = Math.floor(
-          this.position.x - this.pointerPosition.x
-        );
+  updateXPosition(
+    sourcePosition: number,
+    targetPosition: number,
+    maxDistance: number
+  ): number {
+    let sourceToTargetDistance = 0;
+
+    if (targetPosition <= sourcePosition) {
+      if (Math.floor(sourcePosition - targetPosition) < maxDistance) {
+        sourceToTargetDistance = Math.floor(sourcePosition - targetPosition);
       } else {
-        this._pointerDistance = this._pointerMaxDistance;
+        sourceToTargetDistance = maxDistance;
       }
-    } else if (this.pointerPosition.x > this.position.x) {
-      if (
-        Math.floor(this.pointerPosition.x - this.position.x) <
-        this._pointerMaxDistance
-      ) {
-        this._pointerDistance = Math.floor(
-          this._pointerPosition.x - this.position.x
-        );
+    } else if (targetPosition > sourcePosition) {
+      if (Math.floor(targetPosition - sourcePosition) < maxDistance) {
+        sourceToTargetDistance = Math.floor(targetPosition - sourcePosition);
       } else {
-        this._pointerDistance = this._pointerMaxDistance;
+        sourceToTargetDistance = maxDistance;
       }
     }
+
+    return sourceToTargetDistance;
+  }
+
+  updateYPosition(): number {
+    return 0;
+  }
+
+  movePlayer = (timeStamp: number, canvas: HTMLCanvasElement): void => {
+    // update X position
+    this._pointerDistance = this.updateXPosition(
+      this.position.x,
+      this.pointerPosition.x,
+      this._pointerMaxDistance
+    );
+
     // movement implementation
-    // changing this.x regarding the distance with the mouse
     this.position.x +=
       timeStamp * this._dx * this._velocity * (this._pointerDistance / 10);
     // create a variable to influence the falling speed if too close to the top

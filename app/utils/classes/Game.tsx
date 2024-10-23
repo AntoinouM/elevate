@@ -1,4 +1,3 @@
-import { time } from 'console';
 import GameObject from './GameObject';
 import Player from './Player';
 import Planet from './Planet';
@@ -12,6 +11,8 @@ class Game {
   _debug = false;
   _collectiblesPool: GameObject[];
   #config;
+  _lastRenderTime: number;
+  _player: Player | undefined;
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
@@ -27,7 +28,12 @@ class Game {
       PLANET: {
         radius: 12,
       },
+      fps: 60,
+      fpsInterval: 1000 / 60,
     };
+
+    this._lastRenderTime = performance.now(); // Initialize the last render timestamp
+    this._player = undefined;
 
     this.init();
   }
@@ -54,10 +60,16 @@ class Game {
   protected get config() {
     return this.#config;
   }
+  get player(): Player | undefined {
+    return this._player;
+  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
     this._lastTickTimestamp = time;
+  }
+  set player(player: Player | undefined) {
+    this._player = player;
   }
 
   addObject(gameObject: GameObject) {
@@ -71,11 +83,11 @@ class Game {
 
   getObject(id: string) {
     if (!this.gameObjects.has(id)) return;
-    this.gameObjects.get(id);
+    return this.gameObjects.get(id);
   }
 
   init(): void {
-    const player = new Player(
+    this.player = new Player(
       this.config.HERO.width,
       this.config.HERO.height,
       this.canvas.clientWidth / 2,
@@ -89,7 +101,7 @@ class Game {
       40,
       this
     );
-    this.addObject(player);
+    this.addObject(this.player);
     this.addObject(planet);
     this.start();
 
@@ -116,25 +128,35 @@ class Game {
   }
 
   start(): void {
-    // kick off first iteration of render()
     this.lastTickTimestamp = performance.now();
-    requestAnimationFrame(this.gameLoop);
+    let previousTime = performance.now();
+
+    const gameLoop = (currentTime: number): void => {
+      // Calculate time passed since last frame
+      const elapsed = currentTime - previousTime;
+
+      // Only proceed if enough time has passed to match target FPS
+      if (elapsed >= this.config.fpsInterval) {
+        const timePassedSinceLastRender = currentTime - this.lastTickTimestamp;
+
+        // Update and render the game
+        this.update(timePassedSinceLastRender);
+        this.render();
+
+        // Record the last time we rendered
+        previousTime = currentTime - (elapsed % this.config.fpsInterval);
+        this.lastTickTimestamp = currentTime;
+      }
+
+      // Request the next frame
+      requestAnimationFrame(gameLoop);
+    };
+
+    // Start the loop
+    requestAnimationFrame(gameLoop);
   }
 
   end(): void {}
-
-  gameLoop = (): void => {
-    const timePassedSinceLastRender =
-      performance.now() - this.lastTickTimestamp;
-
-    this.update(timePassedSinceLastRender);
-    this.render();
-    this.lastTickTimestamp = performance.now();
-    console.log(timePassedSinceLastRender);
-
-    // call next iteration
-    requestAnimationFrame(this.gameLoop);
-  };
 
   switchState(state: number) {
     this._state = state;
