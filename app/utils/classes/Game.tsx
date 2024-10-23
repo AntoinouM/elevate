@@ -27,6 +27,7 @@ class Game {
       },
       PLANET: {
         radius: 12,
+        maximum: 12,
       },
       fps: 60,
       fpsInterval: 1000 / 60,
@@ -94,20 +95,26 @@ class Game {
       600,
       this
     );
-    const planet = new Planet(
-      this.config.PLANET.radius,
-      this.config.PLANET.radius,
-      195,
-      40,
-      this
-    );
     this.addObject(this.player);
-    this.addObject(planet);
+    this.createPlanetPool(this.config.PLANET.maximum);
     this.start();
 
     this.gameObjects.forEach((value) => {
       value.init();
     });
+  }
+
+  createPlanetPool(max: number) {
+    for (let i = 0; i < max; i++) {
+      const planet = new Planet(
+        this.config.PLANET.radius,
+        this.config.PLANET.radius,
+        Math.random() * this.canvas.width, // X position within canvas width
+        Math.random() * (this.canvas.height - 80) + 40, // Random Y position for visibility
+        this
+      );
+      this.collectiblesPool.push(planet);
+    }
   }
 
   update(timeStamp: number): void {
@@ -124,6 +131,10 @@ class Game {
     }
     this.gameObjects.forEach((value) => {
       value.render();
+    });
+    // Ensure you render the collectibles
+    this.collectiblesPool.forEach((collectible) => {
+      collectible.render(); // Call render for each planet
     });
   }
 
@@ -171,6 +182,18 @@ class Game {
         this.init();
         break;
     }
+  }
+
+  randomXInCanvas(width: number, objectWidth: number): number {
+    let randomizedX = Math.floor(Math.random() * width);
+    if (objectWidth) {
+      if (randomizedX <= objectWidth) {
+        randomizedX = randomizedX + objectWidth;
+      } else if (randomizedX >= width - objectWidth) {
+        randomizedX = randomizedX - objectWidth;
+      }
+    }
+    return randomizedX;
   }
 }
 

@@ -4,6 +4,8 @@ import GameObject from './GameObject';
 class Planet extends GameObject {
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, x, y, game);
+
+    this.init();
   }
 
   draw(
@@ -19,11 +21,13 @@ class Planet extends GameObject {
   }
 
   init() {
-    this.game.context.strokeStyle = 'white';
+    this.game.context.strokeStyle = 'pink';
     this.game.context.lineWidth = 1.5;
+    console.log('init');
   }
   update() {}
   render() {
+    // draw planet
     this.draw(
       this.game.context,
       this.position.x,
