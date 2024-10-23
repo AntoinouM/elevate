@@ -1,5 +1,7 @@
 import { time } from 'console';
 import GameObject from './GameObject';
+import Player from './Player';
+import Planet from './Planet';
 
 class Game {
   _state: number = 0 | 1 | 2;
@@ -8,15 +10,26 @@ class Game {
   _gameObjects = new Map<string, GameObject>();
   _lastTickTimestamp = 0;
   _debug = false;
+  _collectiblesPool: GameObject[];
+  #config;
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
-    canvasDimension: object
-  ) {
+  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
     this._context = context;
     this._state = 0;
+    this._collectiblesPool = [];
+    this.#config = {
+      HERO: {
+        width: 50,
+        height: 50,
+        velocity: 0.02,
+      },
+      PLANET: {
+        radius: 12,
+      },
+    };
+
+    this.init();
   }
 
   // GETTERS
@@ -34,6 +47,12 @@ class Game {
   }
   get lastTickTimestamp() {
     return this._lastTickTimestamp;
+  }
+  get collectiblesPool() {
+    return this._collectiblesPool;
+  }
+  protected get config() {
+    return this.#config;
   }
 
   // SETTERS
@@ -56,8 +75,26 @@ class Game {
   }
 
   init(): void {
+    const player = new Player(
+      this.config.HERO.width,
+      this.config.HERO.height,
+      this.canvas.clientWidth / 2,
+      600,
+      this
+    );
+    const planet = new Planet(
+      this.config.PLANET.radius,
+      this.config.PLANET.radius,
+      195,
+      40,
+      this
+    );
+    this.addObject(player);
+    this.addObject(planet);
+    this.start();
+
     this.gameObjects.forEach((value) => {
-      value.init(this.context);
+      value.init();
     });
   }
 
@@ -67,14 +104,14 @@ class Game {
     });
   }
 
-  render(context: CanvasRenderingContext2D): void {
+  render(): void {
     if (this._debug) {
       this.gameObjects.forEach((value) => {
         value.getBoundingBox();
       });
     }
     this.gameObjects.forEach((value) => {
-      value.render(context);
+      value.render();
     });
   }
 
@@ -91,8 +128,9 @@ class Game {
       performance.now() - this.lastTickTimestamp;
 
     this.update(timePassedSinceLastRender);
-    this.render(this.context);
+    this.render();
     this.lastTickTimestamp = performance.now();
+    console.log(timePassedSinceLastRender);
 
     // call next iteration
     requestAnimationFrame(this.gameLoop);

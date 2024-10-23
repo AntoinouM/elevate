@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from 'react';
 import canvas from '@styles/_canvas.module.scss';
 import Game from '../utils/classes/Game';
-import Player from '../utils/classes/Player';
 
 const ScaledCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -44,14 +43,7 @@ const ScaledCanvas: React.FC = () => {
     window.addEventListener('resize', updateDimension);
 
     // Initialize the game
-    const game = new Game(canvas, context, {
-      width: widthRef,
-      height: heightRef,
-    });
-    const player = new Player(50, 50, canvas.clientWidth / 2, 600);
-    game.addObject(player);
-    game.init();
-    game.start();
+    const game = new Game(canvas, context);
 
     // Clean up the event listener on unmount
     return () => {

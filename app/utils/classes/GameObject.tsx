@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import Game from './Game';
 
 interface Position {
   x: number;
@@ -10,34 +11,49 @@ class GameObject {
   _height: number = 0;
   _position: Position = { x: 0, y: 0 };
   _id;
+  protected game;
 
-  constructor(width: number, height: number, x: number, y: number) {
+  constructor(width: number, height: number, x: number, y: number, game: Game) {
     this._width = width;
     this._height = height;
     this._position.x = x;
     this._position.y = y;
     this._id = uuidv4();
+    this.game = game;
   }
 
   // GETTERS
-  get width() {
+  protected get width() {
     return this._width;
   }
-  get height() {
+  protected get height() {
     return this._height;
   }
-  get position() {
+  protected get position() {
     return this._position;
   }
-  get id() {
+  public get id() {
     return this._id;
   }
 
-  init(context: CanvasRenderingContext2D) {}
-  update(timeStamp: number) {}
-  render(context: CanvasRenderingContext2D) {
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  init(): void {}
+  update(timeStamp: number): void {}
+  render(): void {
+    this.game.context.clearRect(
+      0,
+      0,
+      this.game.context.canvas.width,
+      this.game.context.canvas.height
+    );
   }
+
+  draw(
+    context: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {}
 
   getBoundingBox(): object {
     return {

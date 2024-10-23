@@ -1,3 +1,4 @@
+import Game from './Game';
 import GameObject from './GameObject';
 
 interface Position {
@@ -13,8 +14,8 @@ class Player extends GameObject {
   _pointerMaxDistance = 450;
   _pointerDistance = 0;
 
-  constructor(width: number, height: number, x: number, y: number) {
-    super(width, height, x, y);
+  constructor(width: number, height: number, x: number, y: number, game: Game) {
+    super(width, height, x, y, game);
     this._pointerPosition = {
       x: 0,
       y: 0,
@@ -31,39 +32,56 @@ class Player extends GameObject {
     this._pointerPosition = position;
   }
 
-  init(context: CanvasRenderingContext2D): void {
-    context.fillStyle = 'pink';
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+  draw(
+    context: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
+    // later on add more parameters to make the draw function reusable;
+    context.fillStyle = 'white';
+    context.fillRect(x, y, width, height);
+  }
+
+  init(): void {
     // trigger mouse detection
-    window.addEventListener('mousemove', this.handlePointer);
-    window.addEventListener('touchmove', this.handlePointer);
+    window.addEventListener('mousemove', (event) =>
+      this.handlePointer(event, this.game.context.canvas)
+    );
+    this.game.canvas.addEventListener('touchmove', (event) =>
+      this.handlePointer(event, this.game.context.canvas)
+    );
   }
 
   update(timeStamp: number): void {
     this._dx = this.checkDirection();
-    this.movePlayer(timeStamp);
+    this.movePlayer(timeStamp, this.game.canvas);
   }
-  render(context: CanvasRenderingContext2D): void {
-    super.render(context);
-    context.save();
+  render(): void {
+    super.render();
+    this.game.context.save();
     // super.render(context);
-    context.translate(this.position.x, this.position.y);
+    this.game.context.translate(this.position.x, this.position.y);
     // flip the image if we're moving to the left
-    context.scale(this._dx, 1);
+    this.game.context.scale(this._dx, 1);
 
     // draw player
-    context.fillStyle = 'green';
-    context.fillRect(
+    this.draw(
+      this.game.context,
       -this.width / 2,
-      -this.height / 2,
+      -this.width / 2,
       this.width,
       this.height
     );
 
-    context.restore();
+    this.game.context.restore();
   }
 
-  handlePointer = (event: MouseEvent | TouchEvent): void => {
+  handlePointer = (
+    event: MouseEvent | TouchEvent,
+    canvas: HTMLCanvasElement
+  ): void => {
     if (event.type.includes('touch')) {
       const touchEvent = event as TouchEvent;
       this.pointerPosition = {
@@ -73,13 +91,13 @@ class Player extends GameObject {
     } else if (event.type.includes('mouse')) {
       const mouseEvent = event as MouseEvent;
       this.pointerPosition = {
-        x: mouseEvent.clientX,
-        y: mouseEvent.clientY,
+        x: mouseEvent.clientX - canvas.offsetLeft,
+        y: mouseEvent.clientY - canvas.offsetTop,
       };
     }
   };
 
-  movePlayer = (timeStamp: number): void => {
+  movePlayer = (timeStamp: number, canvas: HTMLCanvasElement): void => {
     // changing x in regard of the mouse position
     if (this.pointerPosition.x <= this.position.x) {
       if (
@@ -116,7 +134,8 @@ class Player extends GameObject {
     // verticalForce input if contact with clouds
     // boundaries checking
     // check for right boundary
-    if (this.position.x > 390) this.position.x = 390;
+    if (this.position.x > canvas.offsetWidth)
+      this.position.x = canvas.offsetWidth;
     // check for left boundary
     if (this.position.x < 0) this.position.x = 0;
     // check for top boundary
