@@ -29,6 +29,8 @@ class Game {
         radius: 12,
         maximum: 12,
         fallingSpeed: 0.5,
+        planetTimer: 0,
+        planetSpawnInterval: 1000,
       },
       fps: 60,
       fpsInterval: 1000 / 60,
@@ -113,11 +115,17 @@ class Game {
       const planet = new Planet(
         this.config.PLANET.radius,
         this.config.PLANET.radius,
-        Math.random() * this.canvas.clientWidth, // X position within canvas width
-        Math.random() * this.canvas.clientHeight, // Random Y position for visibility
+        0,
+        0,
         this
       );
       this.collectiblesPool.push(planet);
+    }
+  }
+
+  getFirstFreePlanetFromPool() {
+    for (let i: number = 0; i < this.collectiblesPool.length; i++) {
+      if (this.collectiblesPool[i].free) return this.collectiblesPool[i];
     }
   }
 
@@ -125,9 +133,19 @@ class Game {
     this.gameObjects.forEach((value) => {
       value.update(timeStamp);
     });
-    this.collectiblesPool.forEach((planet) => {
-      if (planet.free) planet.update(timeStamp);
+    this.collectiblesPool.forEach((col) => {
+      if (!col.free) col.update(timeStamp);
     });
+    // create periodically planets
+    if (
+      this.config.PLANET.planetTimer > this.config.PLANET.planetSpawnInterval
+    ) {
+      const planet = this.getFirstFreePlanetFromPool();
+      planet?.activate();
+      this.config.PLANET.planetTimer = 0;
+    } else {
+      this.config.PLANET.planetTimer += timeStamp;
+    }
   }
 
   render(): void {

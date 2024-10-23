@@ -34,16 +34,22 @@ class Planet extends GameObject {
   }
 
   init(): void {
+    this.position.x = Math.random() * this.game.canvas.clientWidth;
+    this.position.y = 0;
+
     this.game.context.strokeStyle = 'pink';
     this.game.context.lineWidth = 1.5;
   }
 
   update(timeStamp: number): void {
+    if (this.free) return;
     this.position.y += this.game.config.PLANET.fallingSpeed;
+    if (this.position.y > this.game.canvas.clientHeight + this.width / 2)
+      this.reset();
   }
 
   render(): void {
-    // Draw planet using adjusted positions
+    if (this.free) return;
     this.draw(
       this.game.context,
       this.position.x,
@@ -51,6 +57,16 @@ class Planet extends GameObject {
       this.width,
       this.height
     );
+  }
+
+  reset() {
+    this.free = true;
+  }
+
+  activate() {
+    this.free = false;
+    this.position.x = Math.random() * this.game.canvas.clientWidth;
+    this.position.y = 0;
   }
 }
 
