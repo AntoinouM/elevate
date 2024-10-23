@@ -9,7 +9,7 @@ class Game {
   _gameObjects = new Map<string, GameObject>();
   _lastTickTimestamp = 0;
   _debug = false;
-  _collectiblesPool: GameObject[];
+  _collectiblesPool: Planet[];
   _config;
   _lastRenderTime: number;
   _player: Player | undefined;
@@ -28,6 +28,7 @@ class Game {
       PLANET: {
         radius: 12,
         maximum: 12,
+        fallingSpeed: 0.5,
       },
       fps: 60,
       fpsInterval: 1000 / 60,
@@ -123,6 +124,9 @@ class Game {
   update(timeStamp: number): void {
     this.gameObjects.forEach((value) => {
       value.update(timeStamp);
+    });
+    this.collectiblesPool.forEach((planet) => {
+      if (planet.free) planet.update(timeStamp);
     });
   }
 

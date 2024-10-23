@@ -2,10 +2,23 @@ import Game from './Game';
 import GameObject from './GameObject';
 
 class Planet extends GameObject {
+  _free: boolean;
+
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, x, y, game);
+    this._free = true;
 
     this.init();
+  }
+
+  // GETTERS
+  get free(): boolean {
+    return this._free;
+  }
+
+  // SETTERS
+  set free(bool: boolean) {
+    this._free = bool;
   }
 
   draw(
@@ -20,11 +33,15 @@ class Planet extends GameObject {
     context.stroke();
   }
 
-  init() {
+  init(): void {
     this.game.context.strokeStyle = 'pink';
     this.game.context.lineWidth = 1.5;
   }
-  update() {}
+
+  update(timeStamp: number): void {
+    this.position.y += this.game.config.PLANET.fallingSpeed;
+  }
+
   render(): void {
     // Draw planet using adjusted positions
     this.draw(
