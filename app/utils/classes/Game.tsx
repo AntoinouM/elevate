@@ -1,6 +1,7 @@
 import GameObject from './GameObject';
 import Player from './Player';
 import Planet from './Planet';
+import { Idle, Rise, Walk, Fly } from './PlayerStates.tsx/PlayerStates';
 
 class Game {
   _state: number = 0 | 1 | 2;
@@ -12,13 +13,16 @@ class Game {
   _collectiblesPool: Planet[];
   _config;
   _lastRenderTime: number;
-  _player: Player | undefined;
+  _player: Player;
+  _keys: Set<string>;
+  _playerStates: Player[];
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
     this._context = context;
     this._state = 0;
     this._collectiblesPool = [];
+    this._keys = new Set();
     this._config = {
       HERO: {
         width: 50,
@@ -30,7 +34,7 @@ class Game {
         maximum: 12,
         fallingSpeed: 0.5,
         planetTimer: 0,
-        planetSpawnInterval: 1000,
+        planetSpawnInterval: 2000 + Math.random() * 2000,
       },
       fps: 60,
       fpsInterval: 1000 / 60,
@@ -38,11 +42,47 @@ class Game {
       gravity: -0.001,
       impulseForce: 0.62,
     };
-
+    this._playerStates = [
+      new Idle(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+      new Walk(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+      new Rise(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+      new Fly(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+    ];
+    this._player = this._playerStates[0];
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
-    this._player = undefined;
 
     this.init();
+
+    window.addEventListener('keydown', (e) => {
+      this.keys.add(e.key);
+    });
+    window.addEventListener('keyup', () => {
+      this.keys.clear();
+    });
   }
 
   // GETTERS
@@ -67,16 +107,24 @@ class Game {
   get config() {
     return this._config;
   }
-  get player(): Player | undefined {
-    return this._player;
+  get player(): Player {
+    return this._player as Player;
+  }
+  get keys() {
+    return this._keys;
   }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
     this._lastTickTimestamp = time;
   }
-  set player(player: Player | undefined) {
-    this._player = player;
+  set player(player: Player) {
+    this._player = player as Player;
+  }
+
+  setPlayerState(state: number) {
+    this.player = this._playerStates[state];
+    this.player.start();
   }
 
   addObject(gameObject: GameObject) {
@@ -94,20 +142,10 @@ class Game {
   }
 
   init(): void {
-    this.player = new Player(
-      this.config.HERO.width,
-      this.config.HERO.height,
-      this.canvas.clientWidth / 2,
-      this.config.ground,
-      this
-    );
     this.addObject(this.player);
     this.createPlanetPool(this.config.PLANET.maximum);
     this.start();
-
-    this.gameObjects.forEach((value) => {
-      value.init();
-    });
+    this.player.start();
   }
 
   createPlanetPool(max: number) {
@@ -115,8 +153,6 @@ class Game {
       const planet = new Planet(
         this.config.PLANET.radius,
         this.config.PLANET.radius,
-        0,
-        0,
         this
       );
       this.collectiblesPool.push(planet);

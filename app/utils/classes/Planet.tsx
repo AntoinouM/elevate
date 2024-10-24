@@ -4,8 +4,8 @@ import GameObject from './GameObject';
 class Planet extends GameObject {
   _free: boolean;
 
-  constructor(width: number, height: number, x: number, y: number, game: Game) {
-    super(width, height, x, y, game);
+  constructor(width: number, height: number, game: Game) {
+    super(width, height, game);
     this._free = true;
 
     this.init();
@@ -26,7 +26,7 @@ class Planet extends GameObject {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number // eslint-disable-line @typescript-eslint/no-unused-vars
   ): void {
     context.beginPath();
     context.arc(x, y, width, 0, Math.PI * 2);
@@ -41,6 +41,7 @@ class Planet extends GameObject {
     this.game.context.lineWidth = 1.5;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(timeStamp: number): void {
     if (this.free) return;
     this.position.y += this.game.config.PLANET.fallingSpeed;
@@ -61,12 +62,12 @@ class Planet extends GameObject {
 
   reset() {
     this.free = true;
+    this.position.x = Math.random() * this.game.canvas.clientWidth;
+    this.position.y = 0;
   }
 
   activate() {
     this.free = false;
-    this.position.x = Math.random() * this.game.canvas.clientWidth;
-    this.position.y = 0;
   }
 }
 

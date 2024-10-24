@@ -17,12 +17,16 @@ class Player extends GameObject {
   #verticalForce: number = 0;
 
   constructor(width: number, height: number, x: number, y: number, game: Game) {
-    super(width, height, x, y, game);
+    super(width, height, game);
+    this.position.x = x;
+    this.position.y = y;
     this._pointerPosition = {
       x: 0,
       y: 0,
     };
     this._positionYPercent = y / game.canvas.height;
+
+    this.init();
   }
 
   // GETTERS
@@ -55,12 +59,12 @@ class Player extends GameObject {
     this.game.canvas.addEventListener('touchmove', (event) =>
       this.handlePointer(event, this.game.context.canvas)
     );
-    this.game.canvas.addEventListener('touchstart', (event) => {
+    this.game.canvas.addEventListener('touchstart', () => {
       if (this.position.y === this.game.config.ground) {
         this.#verticalForce -= this.game.config.impulseForce;
       }
     });
-    this.game.canvas.addEventListener('mousedown', (event) => {
+    this.game.canvas.addEventListener('mousedown', () => {
       if (this.position.y === this.game.config.ground) {
         this.#verticalForce -= this.game.config.impulseForce;
       }
@@ -82,7 +86,7 @@ class Player extends GameObject {
     this.draw(
       this.game.context,
       -this.width / 2,
-      -this.width / 2,
+      -this.height / 2,
       this.width,
       this.height
     );
@@ -165,7 +169,7 @@ class Player extends GameObject {
 
     // movement implementation
     this.position.x +=
-      timeStamp * this._dx * this._velocity * (this._pointerDistance / 10);
+      timeStamp * this._dx * this._velocity * (this._pointerDistance / 8);
 
     // update Y position
     this.updateYPosition(timeStamp);
@@ -193,6 +197,8 @@ class Player extends GameObject {
   checkDirection(): -1 | 1 {
     return Math.floor(this.pointerPosition.x) < this.position.x ? -1 : 1;
   }
+
+  start() {}
 }
 
 export default Player;

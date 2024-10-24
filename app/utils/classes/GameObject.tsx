@@ -7,19 +7,18 @@ interface Position {
 }
 
 class GameObject {
-  _width: number = 0;
-  _height: number = 0;
-  _position: Position = { x: 0, y: 0 };
+  _width: number;
+  _height: number;
+  _position: Position;
   _id;
   protected game;
 
-  constructor(width: number, height: number, x: number, y: number, game: Game) {
+  constructor(width: number, height: number, game: Game) {
     this._width = width;
     this._height = height;
-    this._position.x = x;
-    this._position.y = y;
     this._id = uuidv4();
     this.game = game;
+    this._position = { x: 0, y: 0 };
   }
 
   // GETTERS
@@ -37,7 +36,10 @@ class GameObject {
   }
 
   init(): void {}
-  update(timeStamp: number): void {}
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  update(timeStamp: number): void {
+    /* timeStamp*/
+  }
   render(): void {}
 
   draw(
@@ -47,6 +49,7 @@ class GameObject {
     width: number,
     height: number
   ): void {}
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   getBoundingBox(): object {
     return {
