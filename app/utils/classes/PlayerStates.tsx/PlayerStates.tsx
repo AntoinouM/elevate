@@ -2,40 +2,31 @@ import Player from '../Player';
 
 class Idle extends Player {
   _options = {
-    src: './astroIdle.png',
     frames: 4,
     fps: 4,
-    image: null,
-    frameSize: {
-      width: 400,
-      height: 400,
-    },
   };
 
   start() {
-    super.start();
-    super.image.src = this._options.src;
+    this.frameY = 0;
+    this._imageOptions.maxFrame = this._options.frames;
+    this._imageOptions.fps = this._options.fps;
   }
   update(timeStamp: number) {
     super.update(timeStamp);
+    if (this.game._keys.has('e')) this.game.setPlayerState(1);
   }
 }
 
 class Walk extends Player {
   _options = {
-    src: '/astroWalk.png',
     frames: 6,
     fps: 8,
-    image: null,
-    frameSize: {
-      width: 400,
-      height: 400,
-    },
   };
 
   start() {
-    super.start();
-    super.image.src = this._options.src;
+    super.frameY = 1;
+    this._imageOptions.maxFrame = this._options.frames;
+    this._imageOptions.fps = this._options.fps;
   }
   update(timeStamp: number) {
     super.update(timeStamp);
@@ -44,19 +35,15 @@ class Walk extends Player {
 
 class Rise extends Player {
   _options = {
-    src: '/astroRise.png',
     frames: 8,
     fps: 4,
-    image: null,
-    frameSize: {
-      width: 400,
-      height: 400,
-    },
   };
 
   start() {
     super.start();
-    super.image.src = this._options.src;
+    this.frameY = 2;
+    this._imageOptions.maxFrame = this._options.frames;
+    this._imageOptions.fps = this._options.fps;
   }
   update(timeStamp: number) {
     super.update(timeStamp);
@@ -65,19 +52,15 @@ class Rise extends Player {
 
 class Fly extends Player {
   _options = {
-    src: '../../../public/astroFly.png',
     frames: 4,
     fps: 8,
-    image: null,
-    frameSize: {
-      width: 400,
-      height: 400,
-    },
   };
 
   start() {
     super.start();
-    super.image.src = this._options.src;
+    this.frameY = 3;
+    this._imageOptions.maxFrame = this._options.frames;
+    this._imageOptions.fps = this._options.fps;
   }
   update(timeStamp: number) {
     super.update(timeStamp);

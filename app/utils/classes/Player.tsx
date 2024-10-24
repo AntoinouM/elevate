@@ -15,12 +15,18 @@ class Player extends GameObject {
   _pointerDistance = 0;
   _positionYPercent: number;
   #verticalForce: number = 0;
+
+  // animation
   _image;
   _imageOptions = {
     width: 400,
     height: 400,
+    maxFrame: 4,
+    fps: 4,
   };
   _imageLoaded: boolean = false;
+  _frameX: number;
+  _frameY: number;
 
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, game);
@@ -31,8 +37,10 @@ class Player extends GameObject {
       y: 0,
     };
     this._positionYPercent = y / game.canvas.height;
+    this._frameX = 1;
+    this._frameY = 0;
     this._image = new Image();
-    this._image.src = '../classes/PlayerStates.tsx/astroIdle.png';
+    this._image.src = '/Astro.png';
     this._image.onload = () => {
       this._imageLoaded = true; // Mark as loaded once the image is fully loaded
     };
@@ -46,13 +54,25 @@ class Player extends GameObject {
   get pointerPosition() {
     return this._pointerPosition;
   }
-  get image() {
-    return this._image;
+  get frameY() {
+    return this._frameY;
+  }
+  get frameX() {
+    return this._frameX;
+  }
+  get pointerDistance() {
+    return this._pointerDistance;
   }
 
   // SETTERS
   set pointerPosition(position: Position) {
     this._pointerPosition = position;
+  }
+  set frameX(int: number) {
+    this._frameX = int;
+  }
+  set frameY(int: number) {
+    this._frameY = int;
   }
 
   // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
@@ -70,7 +90,6 @@ class Player extends GameObject {
   ): void {
     // later on add more parameters to make the draw function reusable;
     if (!this._imageLoaded) return;
-    console.log(image);
     context.drawImage(image, sx, sy, sWidth, sHeight, x, y, width, height);
   }
 
@@ -82,16 +101,16 @@ class Player extends GameObject {
     this.game.canvas.addEventListener('touchmove', (event) =>
       this.handlePointer(event, this.game.context.canvas)
     );
-    this.game.canvas.addEventListener('touchstart', () => {
-      if (this.position.y === this.game.config.ground) {
-        this.#verticalForce -= this.game.config.impulseForce;
-      }
-    });
-    this.game.canvas.addEventListener('mousedown', () => {
-      if (this.position.y === this.game.config.ground) {
-        this.#verticalForce -= this.game.config.impulseForce;
-      }
-    });
+    // this.game.canvas.addEventListener('touchstart', () => {
+    //   if (this.position.y === this.game.config.ground) {
+    //     this.#verticalForce -= this.game.config.impulseForce;
+    //   }
+    // });
+    // this.game.canvas.addEventListener('mousedown', () => {
+    //   if (this.position.y === this.game.config.ground) {
+    //     this.#verticalForce -= this.game.config.impulseForce;
+    //   }
+    // });
   }
 
   update(timeStamp: number): void {
@@ -105,14 +124,20 @@ class Player extends GameObject {
     // flip the image if we're moving to the left
     this.game.context.scale(this._dx, 1);
 
+    // frame check
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    this.frameX = Math.floor(
+      ((performance.now() / 1000) * this._imageOptions.fps) %
+        this._imageOptions.maxFrame
+    );
     // draw player
     this.draw(
       this.game.context,
-      this.image,
-      0,
-      0,
-      400,
-      400,
+      this._image,
+      this.frameX * this._imageOptions.width,
+      this.frameY * this._imageOptions.height,
+      this._imageOptions.width,
+      this._imageOptions.height,
       -this.width / 2,
       -this.height / 2,
       this.width,

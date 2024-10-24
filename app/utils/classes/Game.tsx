@@ -1,4 +1,3 @@
-import GameObject from './GameObject';
 import Player from './Player';
 import Planet from './Planet';
 import { Idle, Rise, Walk, Fly } from './PlayerStates.tsx/PlayerStates';
@@ -7,7 +6,6 @@ class Game {
   _state: number = 0 | 1 | 2;
   _canvas;
   _context;
-  _gameObjects = new Map<string, GameObject>();
   _lastTickTimestamp = 0;
   _debug = false;
   _collectiblesPool: Planet[];
@@ -15,7 +13,7 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  _playerStates = new Map<string, Player>();
+  _playerStates: Player[];
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
@@ -25,8 +23,8 @@ class Game {
     this._keys = new Set();
     this._config = {
       HERO: {
-        width: 60,
-        height: 60,
+        width: 100,
+        height: 100,
         velocity: 0.02,
       },
       PLANET: {
@@ -38,15 +36,42 @@ class Game {
       },
       fps: 60,
       fpsInterval: 1000 / 60,
-      ground: this.canvas.clientHeight - 50 / 1.5,
+      ground: this.canvas.clientHeight - 100 / 1.5,
       gravity: -0.001,
       impulseForce: 0.62,
     };
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
-    this.setStatesMap();
-    this._player = this._playerStates.get('idle')!;
-    this._player.start();
-
+    this._playerStates = [
+      new Idle(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+      new Walk(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+      new Rise(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+      new Fly(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      ),
+    ];
+    this._player = this._playerStates[0];
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -66,9 +91,6 @@ class Game {
   }
   get context() {
     return this._context;
-  }
-  get gameObjects() {
-    return this._gameObjects;
   }
   get lastTickTimestamp() {
     return this._lastTickTimestamp;
@@ -97,30 +119,14 @@ class Game {
     this._player = player as Player;
   }
 
-  setPlayerState(state: string) {
-    this.player = this.playerStates.get(state)!;
-    this.player.start();
-  }
-
-  addObject(gameObject: GameObject) {
-    this.gameObjects.set(gameObject.id, gameObject);
-  }
-
-  removeObject(id: string) {
-    if (!this.gameObjects.has(id)) return;
-    this.gameObjects.delete(id);
-  }
-
-  getObject(id: string) {
-    if (!this.gameObjects.has(id)) return;
-    return this.gameObjects.get(id);
+  setPlayerState(int: number) {
+    this._player = this.playerStates[int];
+    this._player.start();
   }
 
   init(): void {
-    this.addObject(this.player);
     this.createPlanetPool(this.config.PLANET.maximum);
     this.start();
-    this.player.start();
   }
 
   createPlanetPool(max: number) {
@@ -141,9 +147,7 @@ class Game {
   }
 
   update(timeStamp: number): void {
-    this.gameObjects.forEach((value) => {
-      value.update(timeStamp);
-    });
+    this.player.update(timeStamp);
     this.collectiblesPool.forEach((col) => {
       if (!col.free) col.update(timeStamp);
     });
@@ -166,18 +170,11 @@ class Game {
       this.canvas.clientWidth,
       this.canvas.clientHeight
     );
-    if (this._debug) {
-      this.gameObjects.forEach((value) => {
-        value.getBoundingBox();
-      });
-    }
     // Ensure you render the collectibles
     this.collectiblesPool.forEach((collectible) => {
       collectible.render(); // Call render for each planet
     });
-    this.gameObjects.forEach((value) => {
-      value.render();
-    });
+    this.player.render();
   }
 
   start(): void {
@@ -211,21 +208,6 @@ class Game {
 
   end(): void {}
 
-  switchState(state: number) {
-    this._state = state;
-    switch (this._state) {
-      case 1:
-        this.start();
-        break;
-      case 2:
-        this.end();
-        break;
-      default:
-        this.init();
-        break;
-    }
-  }
-
   randomXInCanvas(width: number, objectWidth: number): number {
     let randomizedX = Math.floor(Math.random() * width);
     if (objectWidth) {
@@ -236,50 +218,6 @@ class Game {
       }
     }
     return randomizedX;
-  }
-
-  setStatesMap() {
-    // init map of states
-    this.playerStates.set(
-      'idle',
-      new Idle(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      )
-    );
-    this.playerStates.set(
-      'walk',
-      new Walk(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      )
-    );
-    this.playerStates.set(
-      'rise',
-      new Rise(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      )
-    );
-    this.playerStates.set(
-      'fly',
-      new Fly(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      )
-    );
   }
 }
 
