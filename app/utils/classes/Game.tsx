@@ -15,7 +15,7 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  _playerStates: Player[];
+  _playerStates = new Map<string, Player>();
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
@@ -25,8 +25,8 @@ class Game {
     this._keys = new Set();
     this._config = {
       HERO: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
         velocity: 0.02,
       },
       PLANET: {
@@ -42,38 +42,9 @@ class Game {
       gravity: -0.001,
       impulseForce: 0.62,
     };
-    this._playerStates = [
-      new Idle(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-      new Walk(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-      new Rise(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-      new Fly(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-    ];
-    this._player = this._playerStates[0];
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
+    this.setStatesMap();
+    this._player = this._playerStates.get('idle')!;
 
     this.init();
 
@@ -113,6 +84,9 @@ class Game {
   get keys() {
     return this._keys;
   }
+  get playerStates() {
+    return this._playerStates;
+  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
@@ -122,8 +96,8 @@ class Game {
     this._player = player as Player;
   }
 
-  setPlayerState(state: number) {
-    this.player = this._playerStates[state];
+  setPlayerState(state: string) {
+    this.player = this.playerStates.get(state)!;
     this.player.start();
   }
 
@@ -261,6 +235,50 @@ class Game {
       }
     }
     return randomizedX;
+  }
+
+  setStatesMap() {
+    // init map of states
+    this.playerStates.set(
+      'idle',
+      new Idle(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      )
+    );
+    this.playerStates.set(
+      'walk',
+      new Walk(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      )
+    );
+    this.playerStates.set(
+      'rise',
+      new Rise(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      )
+    );
+    this.playerStates.set(
+      'fly',
+      new Fly(
+        this.config.HERO.width,
+        this.config.HERO.height,
+        this.canvas.clientWidth / 2,
+        this.config.ground,
+        this
+      )
+    );
   }
 }
 
