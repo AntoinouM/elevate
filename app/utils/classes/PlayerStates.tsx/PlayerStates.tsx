@@ -13,8 +13,6 @@ class Idle extends Player {
   }
   update(timeStamp: number) {
     super.update(timeStamp);
-    if (this.game.player !== this.game.playerStates[0]) return;
-    if (this.game._keys.has('s')) this.game.setPlayerState(1);
   }
 }
 
@@ -31,8 +29,6 @@ class Walk extends Player {
   }
   update(timeStamp: number) {
     super.update(timeStamp);
-    if (this.game.player !== this.game.playerStates[1]) return;
-    if (this.game._keys.has('d')) this.game.setPlayerState(0);
   }
 }
 

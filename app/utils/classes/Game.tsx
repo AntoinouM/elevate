@@ -13,7 +13,6 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  _playerStates: Player[];
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
@@ -41,37 +40,13 @@ class Game {
       impulseForce: 0.62,
     };
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
-    this._playerStates = [
-      new Idle(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-      new Walk(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-      new Rise(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-      new Fly(
-        this.config.HERO.width,
-        this.config.HERO.height,
-        this.canvas.clientWidth / 2,
-        this.config.ground,
-        this
-      ),
-    ];
-    this._player = this._playerStates[0];
+    this._player = new Player(
+      this.config.HERO.width,
+      this.config.HERO.height,
+      this.canvas.clientWidth / 2,
+      this.config.ground,
+      this
+    );
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -107,9 +82,6 @@ class Game {
   get keys() {
     return this._keys;
   }
-  get playerStates() {
-    return this._playerStates;
-  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
@@ -117,11 +89,6 @@ class Game {
   }
   set player(player: Player) {
     this._player = player as Player;
-  }
-
-  setPlayerState(int: number) {
-    this._player = this.playerStates[int];
-    this._player.start();
   }
 
   init(): void {

@@ -132,6 +132,15 @@ class Player extends GameObject {
     // flip the image if we're moving to the left
     this.game.context.scale(this._dx, 1);
 
+    if (
+      this.pointerDistance > 2 &&
+      this.position.y === this.game.config.ground
+    ) {
+      this.switchState(1);
+    } else {
+      this.switchState(0);
+    }
+
     // frame check
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.frameX = Math.floor(
