@@ -13,7 +13,8 @@ class Idle extends Player {
   }
   update(timeStamp: number) {
     super.update(timeStamp);
-    if (this.game._keys.has('e')) this.game.setPlayerState(1);
+    if (this.game.player !== this.game.playerStates[0]) return;
+    if (this.game._keys.has('s')) this.game.setPlayerState(1);
   }
 }
 
@@ -30,6 +31,8 @@ class Walk extends Player {
   }
   update(timeStamp: number) {
     super.update(timeStamp);
+    if (this.game.player !== this.game.playerStates[1]) return;
+    if (this.game._keys.has('d')) this.game.setPlayerState(0);
   }
 }
 
@@ -42,8 +45,8 @@ class Rise extends Player {
   start() {
     super.start();
     this.frameY = 2;
-    this._imageOptions.maxFrame = this._options.frames;
-    this._imageOptions.fps = this._options.fps;
+    this._imageOptions.maxFrame = 8;
+    this._imageOptions.fps = 4;
   }
   update(timeStamp: number) {
     super.update(timeStamp);

@@ -51,8 +51,8 @@ class Planet extends GameObject {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(timeStamp: number): void {
     if (this.free) return;
-    this.position.y += this.game.config.PLANET.fallingSpeed;
-    if (this.position.y > this.game.canvas.clientHeight + this.width / 2)
+    this.position.y! += this.game.config.PLANET.fallingSpeed;
+    if (this.position.y! > this.game.canvas.clientHeight + this.width / 2)
       this.reset();
   }
 
@@ -65,8 +65,8 @@ class Planet extends GameObject {
       0,
       0,
       0,
-      this.position.x,
-      this.position.y,
+      this.position.x!,
+      this.position.y!,
       this.width,
       this.height
     );

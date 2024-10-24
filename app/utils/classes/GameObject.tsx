@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Game from './Game';
 
 interface Position {
-  x: number;
-  y: number;
+  x: number | undefined;
+  y: number | undefined;
 }
 
 class GameObject {
@@ -18,7 +18,7 @@ class GameObject {
     this._height = height;
     this._id = uuidv4();
     this.game = game;
-    this._position = { x: 0, y: 0 };
+    this._position = { x: undefined, y: undefined };
   }
 
   // GETTERS

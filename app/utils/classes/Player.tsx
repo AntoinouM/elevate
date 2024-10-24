@@ -14,6 +14,7 @@ class Player extends GameObject {
   _pointerMaxDistance = 450;
   _pointerDistance = 0;
   _positionYPercent: number;
+  _currentState: number;
   #verticalForce: number = 0;
 
   // animation
@@ -39,6 +40,7 @@ class Player extends GameObject {
     this._positionYPercent = y / game.canvas.height;
     this._frameX = 1;
     this._frameY = 0;
+    this._currentState = 0;
     this._image = new Image();
     this._image.src = '/Astro.png';
     this._image.onload = () => {
@@ -63,6 +65,9 @@ class Player extends GameObject {
   get pointerDistance() {
     return this._pointerDistance;
   }
+  get currentState() {
+    return this._currentState;
+  }
 
   // SETTERS
   set pointerPosition(position: Position) {
@@ -73,6 +78,9 @@ class Player extends GameObject {
   }
   set frameY(int: number) {
     this._frameY = int;
+  }
+  set currentState(int: number) {
+    this._currentState = int;
   }
 
   // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
@@ -120,7 +128,7 @@ class Player extends GameObject {
   render(): void {
     this.game.context.save();
     // super.render(context);
-    this.game.context.translate(this.position.x, this.position.y);
+    this.game.context.translate(this.position.x!, this.position.y!);
     // flip the image if we're moving to the left
     this.game.context.scale(this._dx, 1);
 
@@ -194,12 +202,12 @@ class Player extends GameObject {
     // create a variable to influence the falling speed if too close to the top
     let gravityDelta = 1;
     if (
-      ((this.position.y + this.height) * 100) / this.game.canvas.clientHeight <
+      ((this.position.y! + this.height) * 100) / this.game.canvas.clientHeight <
       this.height / 2
     ) {
       gravityDelta =
         1 +
-        this.game.canvas.clientHeight / (this.position.y + this.height) / 10;
+        this.game.canvas.clientHeight / (this.position.y! + this.height) / 10;
     } else {
       gravityDelta = 1;
     }
@@ -207,7 +215,7 @@ class Player extends GameObject {
     // vertical velocity
     this.#verticalForce -= this.game.config.gravity * timeStamp * gravityDelta;
 
-    this.position.y += this.#verticalForce * timeStamp;
+    this.position.y! += this.#verticalForce * timeStamp;
   }
 
   checkBoundaries() {}
@@ -215,32 +223,32 @@ class Player extends GameObject {
   movePlayer = (timeStamp: number, canvas: HTMLCanvasElement): void => {
     // update X position
     this._pointerDistance = this.updateXPosition(
-      this.position.x,
+      this.position.x!,
       this.pointerPosition.x,
       this._pointerMaxDistance
     );
 
     // movement implementation
-    this.position.x +=
+    this.position.x! +=
       timeStamp * this._dx * this._velocity * (this._pointerDistance / 8);
 
     // update Y position
     this.updateYPosition(timeStamp);
 
     // ground check
-    if (this.position.y > this.game.config.ground) {
+    if (this.position.y! > this.game.config.ground) {
       this.position.y = this.game.config.ground;
       this.#verticalForce = 0;
     }
     // verticalForce input if contact with clouds
     // boundaries checking
     // check for right boundary
-    if (this.position.x > canvas.offsetWidth)
+    if (this.position.x! > canvas.offsetWidth)
       this.position.x = canvas.offsetWidth;
     // check for left boundary
-    if (this.position.x < 0) this.position.x = 0;
+    if (this.position.x! < 0) this.position.x = 0;
     // check for top boundary
-    if (this.position.y <= 0) this.position.y = 0;
+    if (this.position.y! <= 0) this.position.y = 0;
   };
 
   getBoundingBox(): object {
@@ -248,10 +256,35 @@ class Player extends GameObject {
   }
 
   checkDirection(): -1 | 1 {
-    return Math.floor(this.pointerPosition.x) < this.position.x ? -1 : 1;
+    return Math.floor(this.pointerPosition.x) < this.position.x! ? -1 : 1;
   }
 
   start() {}
+
+  switchState(int: number) {
+    switch (int) {
+      case 1:
+        this.frameY = 1;
+        this._imageOptions.maxFrame = 6;
+        this._imageOptions.fps = 8;
+        break;
+      case 2:
+        this.frameY = 2;
+        this._imageOptions.maxFrame = 8;
+        this._imageOptions.fps = 4;
+        break;
+      case 3:
+        this.frameY = 3;
+        this._imageOptions.maxFrame = 4;
+        this._imageOptions.fps = 8;
+        break;
+      default:
+        this.frameY = 0;
+        this._imageOptions.maxFrame = 4;
+        this._imageOptions.fps = 4;
+        break;
+    }
+  }
 }
 
 export default Player;
