@@ -21,17 +21,24 @@ class Planet extends GameObject {
     this._free = bool;
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   draw(
     context: CanvasRenderingContext2D,
+    image: CanvasImageSource,
+    sx: number,
+    sy: number,
+    sWidth: number,
+    sHeight: number,
     x: number,
     y: number,
     width: number,
-    height: number // eslint-disable-line @typescript-eslint/no-unused-vars
+    height: number
   ): void {
     context.beginPath();
     context.arc(x, y, width, 0, Math.PI * 2);
     context.stroke();
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   init(): void {
     this.position.x = Math.random() * this.game.canvas.clientWidth;
@@ -53,6 +60,11 @@ class Planet extends GameObject {
     if (this.free) return;
     this.draw(
       this.game.context,
+      new Image(),
+      0,
+      0,
+      0,
+      0,
       this.position.x,
       this.position.y,
       this.width,

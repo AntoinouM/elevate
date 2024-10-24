@@ -44,6 +44,7 @@ const ScaledCanvas: React.FC = () => {
 
     // Initialize the game
     const game = new Game(canvas, context);
+    console.log(game);
 
     // Clean up the event listener on unmount
     return () => {
@@ -51,7 +52,11 @@ const ScaledCanvas: React.FC = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className={canvas.main} />;
+  return (
+    <>
+      <canvas ref={canvasRef} className={canvas.main} />
+    </>
+  );
 };
 
 export default ScaledCanvas;

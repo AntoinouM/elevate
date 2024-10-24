@@ -45,6 +45,7 @@ class Game {
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this.setStatesMap();
     this._player = this._playerStates.get('idle')!;
+    this._player.start();
 
     this.init();
 

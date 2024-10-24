@@ -44,6 +44,11 @@ class GameObject {
 
   draw(
     context: CanvasRenderingContext2D,
+    image: CanvasImageSource,
+    sx: number,
+    sy: number,
+    sWidth: number,
+    sHeight: number,
     x: number,
     y: number,
     width: number,

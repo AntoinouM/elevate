@@ -15,6 +15,12 @@ class Player extends GameObject {
   _pointerDistance = 0;
   _positionYPercent: number;
   #verticalForce: number = 0;
+  _image;
+  _imageOptions = {
+    width: 400,
+    height: 400,
+  };
+  _imageLoaded: boolean = false;
 
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, game);
@@ -25,7 +31,13 @@ class Player extends GameObject {
       y: 0,
     };
     this._positionYPercent = y / game.canvas.height;
-
+    this._image = new Image();
+    this._image.onload = () => {
+      this._imageLoaded = true; // Mark as loaded once the image is fully loaded
+    };
+    this._image.onerror = () => {
+      console.error('Failed to load the player image.');
+    };
     this.init();
   }
 
@@ -33,22 +45,32 @@ class Player extends GameObject {
   get pointerPosition() {
     return this._pointerPosition;
   }
+  get image() {
+    return this._image;
+  }
 
   // SETTERS
   set pointerPosition(position: Position) {
     this._pointerPosition = position;
   }
 
+  // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
   draw(
     context: CanvasRenderingContext2D,
+    image: CanvasImageSource,
+    sx: number,
+    sy: number,
+    sWidth: number,
+    sHeight: number,
     x: number,
     y: number,
     width: number,
     height: number
   ): void {
     // later on add more parameters to make the draw function reusable;
-    context.fillStyle = 'white';
-    context.fillRect(x, y, width, height);
+    if (!this._imageLoaded) return;
+    console.log(image);
+    context.drawImage(image, sx, sy, sWidth, sHeight, x, y, width, height);
   }
 
   init(): void {
@@ -85,6 +107,11 @@ class Player extends GameObject {
     // draw player
     this.draw(
       this.game.context,
+      this.image,
+      0,
+      0,
+      400,
+      400,
       -this.width / 2,
       -this.height / 2,
       this.width,
