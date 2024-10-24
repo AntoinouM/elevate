@@ -32,6 +32,7 @@ class Player extends GameObject {
     };
     this._positionYPercent = y / game.canvas.height;
     this._image = new Image();
+    this._image.src = '../classes/PlayerStates.tsx/astroIdle.png';
     this._image.onload = () => {
       this._imageLoaded = true; // Mark as loaded once the image is fully loaded
     };

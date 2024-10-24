@@ -2,7 +2,7 @@ import Player from '../Player';
 
 class Idle extends Player {
   _options = {
-    src: '../../../public/astroIdle.png',
+    src: './astroIdle.png',
     frames: 4,
     fps: 4,
     image: null,

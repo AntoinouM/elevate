@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import canvas from '@styles/_canvas.module.scss';
 import Game from '../utils/classes/Game';
+import Image from 'next/image';
 
 const ScaledCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -54,6 +55,7 @@ const ScaledCanvas: React.FC = () => {
 
   return (
     <>
+      <Image src={`/astroIdle.png`} alt={'test'} width="64" height="64" />
       <canvas ref={canvasRef} className={canvas.main} />
     </>
   );
