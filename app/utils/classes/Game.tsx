@@ -35,7 +35,7 @@ class Game {
         fallingSpeed: 3,
         planetTimer: 0,
         planetMinInterval: 2000,
-        planetMaxInterval: 4000,
+        planetMaxInterval: 800,
       },
       fps: 60,
       fpsInterval: 1000 / 60,

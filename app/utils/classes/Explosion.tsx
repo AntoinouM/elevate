@@ -9,6 +9,7 @@ class Explosion extends GameObject {
   _frameX: number;
   _timer: number;
   _free: boolean;
+  #angle: number;
   #imageReady: boolean = false;
 
   constructor(x: number, y: number, width: number, height: number, game: Game) {
@@ -31,6 +32,7 @@ class Explosion extends GameObject {
     this._frameX = 0;
     this._timer = 0;
     this._free = true;
+    this.#angle = Math.random() * 6.2;
 
     this.init();
   }
@@ -90,6 +92,11 @@ class Explosion extends GameObject {
       return dim * sizeBuffer;
     };
 
+    this.game.context.save();
+
+    this.game.context.translate(this.position.x, this.position.y);
+    this.game.context.rotate(this.#angle);
+
     this.draw(
       this.game.context,
       this.image,
@@ -97,11 +104,13 @@ class Explosion extends GameObject {
       0,
       this.config.spriteWidth,
       this.config.spriteHeight,
-      this.position.x - dimensionBuffed(this.width) * 0.5,
-      this.position.y - dimensionBuffed(this.height) * 0.5,
+      -dimensionBuffed(this.width) * 0.5,
+      -dimensionBuffed(this.height) * 0.5,
       dimensionBuffed(this.width),
       dimensionBuffed(this.height)
     );
+
+    this.game.context.restore();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -110,7 +119,7 @@ class Explosion extends GameObject {
     if (this.timer % this.config.speed === 0) {
       this.frameX++;
     }
-    if (this.frameX >= this.config.frames) this.reset();
+    if (this.frameX > this.config.frames) this.reset();
   }
 
   reset() {
