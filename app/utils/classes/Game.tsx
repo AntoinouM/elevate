@@ -54,7 +54,7 @@ class Game {
       PLANET: {
         diameter: 24,
         maximum: 12,
-        fallingSpeed: 3,
+        fallingSpeed: 1,
         planetTimer: 0,
         planetMinInterval: 2000,
         planetMaxInterval: 800,

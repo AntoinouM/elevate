@@ -2,11 +2,13 @@
   width: 100%;
   max-width: 550px;
   height: 100vh;
+  height: 100dvh;
   max-height: 650px;
   background-color: $night-blue;
 
   @include breakpoint-max-width(md) {
     max-height: 100vh;
+    max-height: 100dvh;
     max-width: 100%;
   }
 }
