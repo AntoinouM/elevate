@@ -2,6 +2,7 @@ import Player from './Player';
 import Planet from './Planet';
 import { Idle, Rise, Walk, Fly } from './PlayerStates.tsx/PlayerStates';
 import { GameObject } from './GameObject';
+import Explosion from './Explosion';
 
 class Game {
   _state: number = 0 | 1 | 2;
@@ -9,18 +10,18 @@ class Game {
   _context;
   _lastTickTimestamp = 0;
   _collectiblesPool: Planet[];
+  _activeExplosions = new Map<string, Explosion>();
   _config;
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  #gameObjects: GameObject[];
+  #gameObjects = new Map<string, GameObject>();
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
     this._context = context;
     this._state = 0;
     this._collectiblesPool = [];
-    this.#gameObjects = [];
     this._keys = new Set();
     this._config = {
       HERO: {
@@ -31,7 +32,7 @@ class Game {
       PLANET: {
         diameter: 24,
         maximum: 12,
-        fallingSpeed: 0.5,
+        fallingSpeed: 3,
         planetTimer: 0,
         planetSpawnInterval: Math.random() * 2000 + 2000,
       },
@@ -50,7 +51,7 @@ class Game {
       this.config.ground,
       this
     );
-    this.#gameObjects.push(this._player);
+    this.#gameObjects.set(this._player.id, this._player);
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -86,6 +87,9 @@ class Game {
   get keys() {
     return this._keys;
   }
+  get activeExplosions() {
+    return this._activeExplosions;
+  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
@@ -108,7 +112,7 @@ class Game {
         this
       );
       this.collectiblesPool.push(planet);
-      this.#gameObjects.push(planet);
+      this.#gameObjects.set(planet.id, planet);
     }
   }
 
@@ -119,11 +123,8 @@ class Game {
   }
 
   update(timeStamp: number): void {
-    this.player.update(timeStamp);
-    this.collectiblesPool.forEach((col) => {
-      if (!col.free) {
-        col.update(timeStamp);
-      }
+    this.#gameObjects.forEach((obj) => {
+      obj.update(timeStamp);
     });
     // create periodically planets
     if (
@@ -135,6 +136,20 @@ class Game {
     } else {
       this.config.PLANET.planetTimer += timeStamp;
     }
+
+    // check for collision
+    this.collectiblesPool.forEach((planet) => {
+      if (planet.free || !this.objectAreColliding(this.player, planet)) return;
+      let explosion = new Explosion(
+        planet.position.x,
+        planet.position.y,
+        planet.width,
+        planet.height,
+        this
+      );
+      this.#gameObjects.set(explosion.id, explosion);
+      planet.reset();
+    });
   }
 
   render(): void {
@@ -145,10 +160,9 @@ class Game {
       this.canvas.clientHeight
     );
     // Ensure you render the collectibles
-    this.collectiblesPool.forEach((collectible) => {
-      collectible.render(); // Call render for each planet
+    this.#gameObjects.forEach((obj) => {
+      obj.render();
     });
-    this.player.render();
 
     // debug mode
     if (!this.config.debug) return;

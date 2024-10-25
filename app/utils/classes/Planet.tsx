@@ -1,3 +1,4 @@
+import Explosion from './Explosion';
 import Game from './Game';
 import { GameObject } from './GameObject';
 
@@ -52,6 +53,7 @@ class Planet extends GameObject {
   update(timeStamp: number): void {
     if (this.free) return;
     this.position.y! += this.game.config.PLANET.fallingSpeed;
+
     if (this.position.y! > this.game.canvas.clientHeight + this.width * 0.5)
       this.reset();
   }

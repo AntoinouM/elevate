@@ -101,7 +101,6 @@ class Player extends GameObject {
     this._verticalForce = int;
   }
 
-  // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
   draw(
     context: CanvasRenderingContext2D,
     image: CanvasImageSource,

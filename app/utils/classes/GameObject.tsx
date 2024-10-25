@@ -22,13 +22,13 @@ class GameObject {
   }
 
   // GETTERS
-  protected get width() {
+  public get width() {
     return this._width;
   }
-  protected get height() {
+  public get height() {
     return this._height;
   }
-  protected get position() {
+  public get position() {
     return this._position;
   }
   public get id() {
