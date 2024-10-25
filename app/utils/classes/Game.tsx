@@ -35,7 +35,8 @@ class Game {
         maximum: 12,
         fallingSpeed: 3,
         planetTimer: 0,
-        planetSpawnInterval: Math.random() * 2000 + 2000,
+        planetMinInterval: 2000,
+        planetMaxInterval: 4000,
       },
       fps: 60,
       fpsInterval: 1000 / 60,
@@ -157,9 +158,7 @@ class Game {
       }
     });
     // create periodically planets
-    if (
-      this.config.PLANET.planetTimer > this.config.PLANET.planetSpawnInterval
-    ) {
+    if (this.config.PLANET.planetTimer > this.config.PLANET.planetMaxInterval) {
       const planet = this.getFirstFreePlanetFromPool();
       planet?.activate();
       this.config.PLANET.planetTimer = 0;
