@@ -1,5 +1,5 @@
 import Game from './Game';
-import GameObject from './GameObject';
+import { GameObject } from './GameObject';
 
 class Planet extends GameObject {
   _free: boolean;

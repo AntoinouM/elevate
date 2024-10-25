@@ -1,5 +1,6 @@
 import Game from './Game';
-import GameObject from './GameObject';
+import { GameObject } from './GameObject';
+import { Fly, Idle, Rise, State, Walk } from './State';
 
 interface Position {
   x: number;
@@ -14,8 +15,9 @@ class Player extends GameObject {
   _pointerMaxDistance = 450;
   _pointerDistance = 0;
   _positionYPercent: number;
-  _currentState: number;
-  #verticalForce: number = 0;
+  _states: Idle[] | Walk[] | Rise[] | Fly[];
+  _currentState: Idle | Walk | Rise | Fly;
+  _verticalForce: number = 0;
 
   // animation
   _image;
@@ -40,7 +42,13 @@ class Player extends GameObject {
     this._positionYPercent = y / game.canvas.height;
     this._frameX = 1;
     this._frameY = 0;
-    this._currentState = 0;
+    this._states = [
+      new Idle(this),
+      new Walk(this),
+      new Rise(this),
+      new Fly(this),
+    ];
+    this._currentState = this._states[0];
     this._image = new Image();
     this._image.src = '/Astro.png';
     this._image.onload = () => {
@@ -68,6 +76,12 @@ class Player extends GameObject {
   get currentState() {
     return this._currentState;
   }
+  get states() {
+    return this._states;
+  }
+  get verticalForce() {
+    return this._verticalForce;
+  }
 
   // SETTERS
   set pointerPosition(position: Position) {
@@ -79,8 +93,11 @@ class Player extends GameObject {
   set frameY(int: number) {
     this._frameY = int;
   }
-  set currentState(int: number) {
-    this._currentState = int;
+  set currentState(state: Idle | Walk | Rise | Fly) {
+    this._currentState = state;
+  }
+  set verticalForce(int: number) {
+    this._verticalForce = int;
   }
 
   // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
@@ -109,21 +126,22 @@ class Player extends GameObject {
     this.game.canvas.addEventListener('touchmove', (event) =>
       this.handlePointer(event, this.game.context.canvas)
     );
-    // this.game.canvas.addEventListener('touchstart', () => {
-    //   if (this.position.y === this.game.config.ground) {
-    //     this.#verticalForce -= this.game.config.impulseForce;
-    //   }
-    // });
-    // this.game.canvas.addEventListener('mousedown', () => {
-    //   if (this.position.y === this.game.config.ground) {
-    //     this.#verticalForce -= this.game.config.impulseForce;
-    //   }
-    // });
+    this.game.canvas.addEventListener('touchstart', () => {
+      if (this.position.y === this.game.config.ground) {
+        this.verticalForce -= this.game.config.impulseForce;
+      }
+    });
+    this.game.canvas.addEventListener('mousedown', () => {
+      if (this.position.y === this.game.config.ground) {
+        this.verticalForce -= this.game.config.impulseForce;
+      }
+    });
   }
 
   update(timeStamp: number): void {
     this._dx = this.checkDirection();
     this.movePlayer(timeStamp, this.game.canvas);
+    this.currentState.handleStateChange(this.position, this.game.config);
   }
   render(): void {
     this.game.context.save();
@@ -132,21 +150,26 @@ class Player extends GameObject {
     // flip the image if we're moving to the left
     this.game.context.scale(this._dx, 1);
 
-    if (
-      this.pointerDistance > 2 &&
-      this.position.y === this.game.config.ground
-    ) {
-      this.switchState(1);
-    } else {
-      this.switchState(0);
-    }
-
     // frame check
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.frameX = Math.floor(
       ((performance.now() / 1000) * this._imageOptions.fps) %
         this._imageOptions.maxFrame
     );
+    if (this.currentState.state === 'RISE') {
+      let isAtEnd = false;
+      // Check if the frame is at the end
+      if (this.frameX >= this._imageOptions.maxFrame - 1) {
+        // Toggle between frame 7 and 8
+        if (!isAtEnd) {
+          this.frameX = this._imageOptions.maxFrame - 1; // Frame 7
+          isAtEnd = true;
+        } else {
+          this.frameX = this._imageOptions.maxFrame; // Frame 8
+          isAtEnd = false;
+        }
+      }
+    }
     // draw player
     this.draw(
       this.game.context,
@@ -222,9 +245,9 @@ class Player extends GameObject {
     }
     // y movement with simplified Euleur algorythm
     // vertical velocity
-    this.#verticalForce -= this.game.config.gravity * timeStamp * gravityDelta;
+    this.verticalForce -= this.game.config.gravity * timeStamp * gravityDelta;
 
-    this.position.y! += this.#verticalForce * timeStamp;
+    this.position.y! += this.verticalForce * timeStamp;
   }
 
   checkBoundaries() {}
@@ -247,7 +270,7 @@ class Player extends GameObject {
     // ground check
     if (this.position.y! > this.game.config.ground) {
       this.position.y = this.game.config.ground;
-      this.#verticalForce = 0;
+      this.verticalForce = 0;
     }
     // verticalForce input if contact with clouds
     // boundaries checking
@@ -270,29 +293,9 @@ class Player extends GameObject {
 
   start() {}
 
-  switchState(int: number) {
-    switch (int) {
-      case 1:
-        this.frameY = 1;
-        this._imageOptions.maxFrame = 6;
-        this._imageOptions.fps = 8;
-        break;
-      case 2:
-        this.frameY = 2;
-        this._imageOptions.maxFrame = 8;
-        this._imageOptions.fps = 4;
-        break;
-      case 3:
-        this.frameY = 3;
-        this._imageOptions.maxFrame = 4;
-        this._imageOptions.fps = 8;
-        break;
-      default:
-        this.frameY = 0;
-        this._imageOptions.maxFrame = 4;
-        this._imageOptions.fps = 4;
-        break;
-    }
+  setState(state: number) {
+    this.currentState = this.states[state];
+    this.currentState.enter();
   }
 }
 
