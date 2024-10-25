@@ -8,6 +8,7 @@ class Explosion extends GameObject {
   _image: HTMLImageElement;
   _frameX: number;
   _timer: number;
+  _free: boolean;
   #imageReady: boolean = false;
 
   constructor(x: number, y: number, width: number, height: number, game: Game) {
@@ -20,7 +21,7 @@ class Explosion extends GameObject {
       spriteWidth: 200,
       spriteHeight: 179,
       frames: 5,
-      speed: 10,
+      speed: 5,
     };
     this._image = new Image();
     this._image.onload = () => {
@@ -29,6 +30,7 @@ class Explosion extends GameObject {
     this._image.src = '/boom.png';
     this._frameX = 0;
     this._timer = 0;
+    this._free = true;
 
     this.init();
   }
@@ -52,6 +54,9 @@ class Explosion extends GameObject {
   get timer() {
     return this._timer;
   }
+  get free() {
+    return this._free;
+  }
 
   // SETTERS
   set frameX(int: number) {
@@ -59,6 +64,9 @@ class Explosion extends GameObject {
   }
   set timer(int: number) {
     this._timer = int;
+  }
+  set free(bool: boolean) {
+    this._free = bool;
   }
 
   draw(
@@ -73,22 +81,26 @@ class Explosion extends GameObject {
     width: number,
     height: number
   ): void {
-    console.log('draw');
     context.drawImage(image, sx, sy, sWidth, sHeight, x, y, width, height);
   }
 
   render() {
+    const sizeBuffer = 1.5;
+    const dimensionBuffed = (dim: number) => {
+      return dim * sizeBuffer;
+    };
+
     this.draw(
       this.game.context,
       this.image,
       this.config.spriteWidth * this.frameX,
-      this.config.spriteHeight,
+      0,
       this.config.spriteWidth,
       this.config.spriteHeight,
-      this.position.x - this.width * 0.5,
-      this.position.y - this.height * 0.5,
-      this.width,
-      this.height
+      this.position.x - dimensionBuffed(this.width) * 0.5,
+      this.position.y - dimensionBuffed(this.height) * 0.5,
+      dimensionBuffed(this.width),
+      dimensionBuffed(this.height)
     );
   }
 
@@ -97,6 +109,18 @@ class Explosion extends GameObject {
     if (this.timer % this.config.speed === 0) {
       this.frameX++;
     }
+    if (this.frameX >= this.config.frames) this.reset();
+  }
+
+  reset() {
+    this.free = true;
+  }
+
+  activate(x: number, y: number) {
+    this.position.x = x;
+    this.position.y = y;
+    this.frameX = 0;
+    this.free = false;
   }
 }
 
