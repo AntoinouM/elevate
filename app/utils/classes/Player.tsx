@@ -43,10 +43,10 @@ class Player extends GameObject {
     this._frameX = 1;
     this._frameY = 0;
     this._states = [
-      new Idle(this),
-      new Walk(this),
-      new Rise(this),
-      new Fly(this),
+      new Idle(this.game),
+      new Walk(this.game),
+      new Rise(this.game),
+      new Fly(this.game),
     ];
     this._currentState = this._states[0];
     this._image = new Image();

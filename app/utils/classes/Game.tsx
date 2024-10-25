@@ -2,6 +2,7 @@ import Player from './Player';
 import Planet from './Planet';
 import { GameObject } from './GameObject';
 import Explosion from './Explosion';
+import { Dust } from './Particule';
 
 interface GameConfig {
   HERO: {
@@ -32,6 +33,7 @@ class Game {
   _lastTickTimestamp = 0;
   _collectiblesPool: Planet[];
   _explosionsPool: Explosion[];
+  _particles: Dust[];
   _config;
   _lastRenderTime: number;
   _player: Player;
@@ -44,6 +46,7 @@ class Game {
     this._state = 0;
     this._collectiblesPool = [];
     this._explosionsPool = [];
+    this._particles = [];
     this._keys = new Set();
     this._config = {
       HERO: {
@@ -113,6 +116,9 @@ class Game {
   get keys() {
     return this._keys;
   }
+  get particles() {
+    return this._particles;
+  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
@@ -178,6 +184,13 @@ class Game {
         obj.update(timeStamp);
       }
     });
+
+    // update particules
+    this.particles.forEach((dust, index) => {
+      dust.update(timeStamp);
+      if (!dust.isActive) this.particles.splice(index, 1);
+    });
+
     // create periodically planets
     if (this.config.PLANET.planetTimer > this.config.PLANET.planetMaxInterval) {
       const planet = this.getFirstFreePlanetFromPool();
@@ -207,6 +220,11 @@ class Game {
       this.canvas.clientWidth,
       this.canvas.clientHeight
     );
+    // render particules
+    this.particles.forEach((dust) => {
+      dust.draw(this.context);
+    });
+
     // Ensure you render the collectibles
     this.#gameObjects.forEach((obj) => {
       if (obj instanceof Planet || obj instanceof Explosion) {
