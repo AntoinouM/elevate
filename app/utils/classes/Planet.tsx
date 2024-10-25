@@ -1,4 +1,3 @@
-import Explosion from './Explosion';
 import Game from './Game';
 import { GameObject } from './GameObject';
 

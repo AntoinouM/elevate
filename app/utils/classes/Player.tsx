@@ -1,6 +1,6 @@
 import Game from './Game';
-import { GameObject } from './GameObject';
-import { Fly, Idle, Rise, State, Walk } from './State';
+import { BoundingBox, GameObject } from './GameObject';
+import { Fly, Idle, Rise, Walk } from './State';
 
 interface Position {
   x: number;
@@ -269,7 +269,7 @@ class Player extends GameObject {
     if (this.position.y! <= 0) this.position.y = 0;
   };
 
-  getBoundingBox(): object {
+  getBoundingBox(): BoundingBox {
     return {
       x: this.position.x - this.width * 0.5 * 0.5,
       y: this.position.y - this.height * 0.9 * 0.5,

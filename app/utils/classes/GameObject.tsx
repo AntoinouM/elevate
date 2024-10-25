@@ -6,6 +6,13 @@ interface Position {
   y: number;
 }
 
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 class GameObject {
   _width: number;
   _height: number;
@@ -56,7 +63,7 @@ class GameObject {
   ): void {}
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
-  getBoundingBox(): any {
+  getBoundingBox(): BoundingBox {
     return {
       x: this.position.x - this.width * 0.5,
       y: this.position.y - this.height * 0.5,
@@ -80,4 +87,4 @@ class GameObject {
 }
 
 export { GameObject };
-export type { Position };
+export type { Position, BoundingBox };

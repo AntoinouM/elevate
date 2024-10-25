@@ -1,6 +1,5 @@
 import Player from './Player';
 import Planet from './Planet';
-import { Idle, Rise, Walk, Fly } from './PlayerStates.tsx/PlayerStates';
 import { GameObject } from './GameObject';
 import Explosion from './Explosion';
 
@@ -238,8 +237,8 @@ class Game {
   end(): void {}
 
   objectAreColliding(object1: GameObject, object2: GameObject): boolean {
-    let bbA = object1.getBoundingBox();
-    let bbB = object2.getBoundingBox();
+    const bbA = object1.getBoundingBox();
+    const bbB = object2.getBoundingBox();
 
     if (
       bbA.x < bbB.x + bbB.width &&

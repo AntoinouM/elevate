@@ -104,6 +104,7 @@ class Explosion extends GameObject {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   update(timeStamp: number) {
     this.timer++;
     if (this.timer % this.config.speed === 0) {
