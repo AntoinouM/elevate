@@ -1,3 +1,4 @@
+import { GameConfig } from './Game';
 import Player from './Player';
 
 const states = {
@@ -53,7 +54,7 @@ class Idle extends State {
     this.player._imageOptions.maxFrame = 4;
     this.player._imageOptions.fps = 4;
   }
-  handleStateChange(position: Position, config: any) {
+  handleStateChange(position: Position, config: GameConfig) {
     if (this.player.pointerDistance > 2 && position.y === config.ground) {
       this.player.setState(states.WALK);
     } else if (this.player.verticalForce < 0) {
@@ -85,7 +86,7 @@ class Walk extends State {
     this.player._imageOptions.maxFrame = 6;
     this.player._imageOptions.fps = 8;
   }
-  handleStateChange(position: Position, config: any) {
+  handleStateChange(position: Position, config: GameConfig) {
     if (this.player.pointerDistance <= 2 && position.y === config.ground) {
       this.player.setState(states.IDLE);
     } else if (this.player.verticalForce < 0) {
@@ -115,12 +116,14 @@ class Rise extends State {
   enter() {
     this.player.frameY = 2;
     this.player._imageOptions.maxFrame = 8;
-    this.player._imageOptions.fps = 4;
+    this.player._imageOptions.fps = 6;
   }
-  handleStateChange(position: Position, config: any) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  handleStateChange(position: Position, config: GameConfig) {
     if (this.player.verticalForce >= 0) this.player.setState(states.FLY);
   }
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 class Fly extends State {
   _player: Player;
@@ -145,7 +148,7 @@ class Fly extends State {
     this.player._imageOptions.maxFrame = 4;
     this.player._imageOptions.fps = 8;
   }
-  handleStateChange(position: Position, config: any) {
+  handleStateChange(position: Position, config: GameConfig) {
     if (this.player.pointerDistance > 2 && position.y === config.ground) {
       this.player.setState(states.WALK);
     } else if (

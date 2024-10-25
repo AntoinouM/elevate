@@ -113,7 +113,7 @@ class Explosion extends GameObject {
     this.game.context.restore();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   update(timeStamp: number) {
     this.timer++;
     if (this.timer % this.config.speed === 0) {
@@ -121,6 +121,7 @@ class Explosion extends GameObject {
     }
     if (this.frameX > this.config.frames) this.reset();
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   reset() {
     this.free = true;

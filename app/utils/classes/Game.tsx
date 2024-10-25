@@ -3,6 +3,28 @@ import Planet from './Planet';
 import { GameObject } from './GameObject';
 import Explosion from './Explosion';
 
+interface GameConfig {
+  HERO: {
+    width: number;
+    height: number;
+    velocity: number;
+  };
+  PLANET: {
+    diameter: number;
+    maximum: number;
+    fallingSpeed: number;
+    planetTimer: number;
+    planetMinInterval: number;
+    planetMaxInterval: number;
+  };
+  fps: number;
+  fpsInterval: number;
+  ground: number;
+  gravity: number;
+  impulseForce: number;
+  debug: boolean;
+}
+
 class Game {
   _state: number = 0 | 1 | 2;
   _canvas;
@@ -265,3 +287,4 @@ class Game {
 }
 
 export default Game;
+export type { GameConfig };
