@@ -148,6 +148,7 @@ class Game {
         this
       );
       this.#gameObjects.set(explosion.id, explosion);
+      this.player.verticalForce = -this.config.impulseForce;
       planet.reset();
     });
   }

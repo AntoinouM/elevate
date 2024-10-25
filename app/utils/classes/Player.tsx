@@ -18,7 +18,6 @@ class Player extends GameObject {
   _states: Idle[] | Walk[] | Rise[] | Fly[];
   _currentState: Idle | Walk | Rise | Fly;
   _verticalForce: number = 0;
-  private isAtEnd: boolean = false;
 
   // animation
   _image;
