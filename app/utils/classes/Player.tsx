@@ -18,6 +18,7 @@ class Player extends GameObject {
   _states: Idle[] | Walk[] | Rise[] | Fly[];
   _currentState: Idle | Walk | Rise | Fly;
   _verticalForce: number = 0;
+  private isAtEnd: boolean = false;
 
   // animation
   _image;
@@ -156,20 +157,7 @@ class Player extends GameObject {
       ((performance.now() / 1000) * this._imageOptions.fps) %
         this._imageOptions.maxFrame
     );
-    if (this.currentState.state === 'RISE') {
-      let isAtEnd = false;
-      // Check if the frame is at the end
-      if (this.frameX >= this._imageOptions.maxFrame - 1) {
-        // Toggle between frame 7 and 8
-        if (!isAtEnd) {
-          this.frameX = this._imageOptions.maxFrame - 1; // Frame 7
-          isAtEnd = true;
-        } else {
-          this.frameX = this._imageOptions.maxFrame; // Frame 8
-          isAtEnd = false;
-        }
-      }
-    }
+
     // draw player
     this.draw(
       this.game.context,

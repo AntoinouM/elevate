@@ -115,11 +115,9 @@ class Rise extends State {
   enter() {
     this.player.frameY = 2;
     this.player._imageOptions.maxFrame = 8;
-    this.player._imageOptions.fps = 6;
-    console.log('enter RISE');
+    this.player._imageOptions.fps = 4;
   }
   handleStateChange(position: Position, config: any) {
-    console.log(this.player.verticalForce);
     if (this.player.verticalForce >= 0) this.player.setState(states.FLY);
   }
 }
