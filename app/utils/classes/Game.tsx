@@ -1,24 +1,26 @@
 import Player from './Player';
 import Planet from './Planet';
 import { Idle, Rise, Walk, Fly } from './PlayerStates.tsx/PlayerStates';
+import { GameObject } from './GameObject';
 
 class Game {
   _state: number = 0 | 1 | 2;
   _canvas;
   _context;
   _lastTickTimestamp = 0;
-  _debug = false;
   _collectiblesPool: Planet[];
   _config;
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
+  #gameObjects: GameObject[];
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this._canvas = canvas;
     this._context = context;
     this._state = 0;
     this._collectiblesPool = [];
+    this.#gameObjects = [];
     this._keys = new Set();
     this._config = {
       HERO: {
@@ -27,26 +29,28 @@ class Game {
         velocity: 0.02,
       },
       PLANET: {
-        radius: 12,
+        diameter: 24,
         maximum: 12,
         fallingSpeed: 0.5,
         planetTimer: 0,
-        planetSpawnInterval: 2000 + Math.random() * 2000,
+        planetSpawnInterval: Math.random() * 2000 + 2000,
       },
       fps: 60,
       fpsInterval: 1000 / 60,
       ground: this.canvas.clientHeight - 100 / 1.5,
       gravity: -0.001,
       impulseForce: 0.62,
+      debug: true,
     };
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this._player = new Player(
       this.config.HERO.width,
       this.config.HERO.height,
-      this.canvas.clientWidth / 2,
+      this.canvas.clientWidth * 0.5,
       this.config.ground,
       this
     );
+    this.#gameObjects.push(this._player);
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -99,11 +103,12 @@ class Game {
   createPlanetPool(max: number) {
     for (let i = 0; i < max; i++) {
       const planet = new Planet(
-        this.config.PLANET.radius,
-        this.config.PLANET.radius,
+        this.config.PLANET.diameter,
+        this.config.PLANET.diameter,
         this
       );
       this.collectiblesPool.push(planet);
+      this.#gameObjects.push(planet);
     }
   }
 
@@ -116,7 +121,9 @@ class Game {
   update(timeStamp: number): void {
     this.player.update(timeStamp);
     this.collectiblesPool.forEach((col) => {
-      if (!col.free) col.update(timeStamp);
+      if (!col.free) {
+        col.update(timeStamp);
+      }
     });
     // create periodically planets
     if (
@@ -142,6 +149,12 @@ class Game {
       collectible.render(); // Call render for each planet
     });
     this.player.render();
+
+    // debug mode
+    if (!this.config.debug) return;
+    this.#gameObjects.forEach((object) => {
+      object.drawBoundingBox(this.context);
+    });
   }
 
   start(): void {
@@ -174,6 +187,21 @@ class Game {
   }
 
   end(): void {}
+
+  objectAreColliding(object1: GameObject, object2: GameObject): boolean {
+    let bbA = object1.getBoundingBox();
+    let bbB = object2.getBoundingBox();
+
+    if (
+      bbA.x < bbB.x + bbB.width &&
+      bbA.x + bbA.width > bbB.x &&
+      bbA.y < bbB.y + bbB.height &&
+      bbA.y + bbA.height > bbB.y
+    ) {
+      // collision happened
+      return true;
+    } else return false;
+  }
 
   randomXInCanvas(width: number, objectWidth: number): number {
     let randomizedX = Math.floor(Math.random() * width);

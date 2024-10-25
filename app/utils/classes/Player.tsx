@@ -166,8 +166,8 @@ class Player extends GameObject {
       this.frameY * this._imageOptions.height,
       this._imageOptions.width,
       this._imageOptions.height,
-      -this.width / 2,
-      -this.height / 2,
+      -this.width * 0.5,
+      -this.height * 0.5,
       this.width,
       this.height
     );
@@ -223,7 +223,7 @@ class Player extends GameObject {
     let gravityDelta = 1;
     if (
       ((this.position.y! + this.height) * 100) / this.game.canvas.clientHeight <
-      this.height / 2
+      this.height * 0.5
     ) {
       gravityDelta =
         1 +
@@ -272,7 +272,12 @@ class Player extends GameObject {
   };
 
   getBoundingBox(): object {
-    return super.getBoundingBox();
+    return {
+      x: this.position.x - this.width * 0.5 * 0.5,
+      y: this.position.y - this.height * 0.9 * 0.5,
+      width: this.width * 0.5,
+      height: this.height * 0.9,
+    };
   }
 
   checkDirection(): -1 | 1 {

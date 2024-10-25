@@ -52,7 +52,7 @@ class Planet extends GameObject {
   update(timeStamp: number): void {
     if (this.free) return;
     this.position.y! += this.game.config.PLANET.fallingSpeed;
-    if (this.position.y! > this.game.canvas.clientHeight + this.width / 2)
+    if (this.position.y! > this.game.canvas.clientHeight + this.width * 0.5)
       this.reset();
   }
 
@@ -67,7 +67,7 @@ class Planet extends GameObject {
       0,
       this.position.x!,
       this.position.y!,
-      this.width,
+      this.width * 0.5,
       this.height
     );
   }

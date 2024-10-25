@@ -56,15 +56,26 @@ class GameObject {
   ): void {}
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
-  getBoundingBox(): object {
+  getBoundingBox(): any {
     return {
-      position: {
-        x: this.position.x,
-        y: this.position.y,
-        width: this.width,
-        height: this.height,
-      },
+      x: this.position.x - this.width * 0.5,
+      y: this.position.y - this.height * 0.5,
+      width: this.width,
+      height: this.height,
     };
+  }
+
+  drawBoundingBox(context: CanvasRenderingContext2D): void {
+    const bb = this.getBoundingBox();
+    context.strokeStyle = 'pink';
+    context.lineWidth = 1.5;
+    context.strokeRect(bb.x, bb.y, bb.width, bb.height);
+
+    context.fillStyle = 'red';
+    context.fillRect(bb.x, bb.y, 5, 5);
+
+    context.fillStyle = 'yellow';
+    context.fillRect(this.position.x, this.position.y, 5, 5);
   }
 }
 
