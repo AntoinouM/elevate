@@ -110,8 +110,9 @@ class Fly extends State {
     this.game.player._imageOptions.fps = 8;
   }
   handleStateChange(position: Position, config: GameConfig) {
-    if (position.y > config.ground) {
-      if (this.game.player.verticalForce <= 0)
+    if (position.y < config.ground) {
+      console.log(this.game.player.verticalForce);
+      if (this.game.player.verticalForce < 0)
         this.game.player.setState(states.RISE);
     } else if (position.y === config.ground) {
       if (this.game.player.pointerDistance > 2) {
