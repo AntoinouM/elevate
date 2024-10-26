@@ -30,6 +30,8 @@ class Game {
   _state: number = 0 | 1 | 2;
   _canvas;
   _context;
+  _backgroundCanvas;
+  _backgroundContext;
   _lastTickTimestamp = 0;
   _collectiblesPool: Planet[];
   _explosionsPool: Explosion[];
@@ -40,9 +42,16 @@ class Game {
   _keys: Set<string>;
   #gameObjects = new Map<string, GameObject>();
 
-  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    backgroundCanvas: HTMLCanvasElement,
+    backgroundContext: CanvasRenderingContext2D
+  ) {
     this._canvas = canvas;
     this._context = context;
+    this._backgroundCanvas = backgroundCanvas;
+    this._backgroundContext = backgroundContext;
     this._state = 0;
     this._collectiblesPool = [];
     this._explosionsPool = [];
@@ -97,6 +106,12 @@ class Game {
   }
   get context() {
     return this._context;
+  }
+  get backgroundCanvas() {
+    return this._backgroundCanvas;
+  }
+  get backgroundContext() {
+    return this._backgroundContext;
   }
   get lastTickTimestamp() {
     return this._lastTickTimestamp;

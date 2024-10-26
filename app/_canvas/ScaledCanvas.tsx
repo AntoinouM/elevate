@@ -47,7 +47,7 @@ const ScaledCanvas: React.FC = () => {
     window.addEventListener('resize', updateDimension);
 
     // Initialize the game
-    const game = new Game(canvas, context);
+    const game = new Game(canvas, context, canvasBg, contextBg);
     console.log(game);
 
     // Clean up the event listener on unmount
