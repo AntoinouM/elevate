@@ -6,6 +6,7 @@ import Game from '../utils/classes/Game';
 
 const ScaledCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasBackground = useRef<HTMLCanvasElement | null>(null);
   const widthRef = useRef<number>(0);
   const heightRef = useRef<number>(0);
 
@@ -25,16 +26,19 @@ const ScaledCanvas: React.FC = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const canvasBg = canvasBackground.current;
 
-    if (!canvas) return; // TypeScript safety check
+    if (!canvas || !canvasBg) return; // TypeScript safety check
 
     const context = canvas.getContext('2d');
-    if (!context) return; // TypeScript safety check
+    const contextBg = canvasBg.getContext('2d');
+    if (!context || !contextBg) return; // TypeScript safety check
 
     const updateDimension = (): void => {
       widthRef.current = canvas.clientWidth;
       heightRef.current = canvas.clientHeight;
       setupCanvas(canvas, context, widthRef.current, heightRef.current);
+      setupCanvas(canvasBg, contextBg, widthRef.current, heightRef.current);
     };
 
     updateDimension(); // Set initial dimensions
@@ -54,6 +58,7 @@ const ScaledCanvas: React.FC = () => {
 
   return (
     <>
+      <canvas ref={canvasBackground} className={canvas.background} />
       <canvas ref={canvasRef} className={canvas.main} />
     </>
   );
