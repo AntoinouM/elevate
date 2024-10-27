@@ -52,13 +52,34 @@ class ParticlesContainer extends GameObject {
   }
 
   render(): void {
-    this.drawRect(
-      this.game.backgroundContext,
-      this.width,
-      this.height,
-      this.position.x - this.width / 2,
-      this.position.y - this.height / 2
+    this.game.backgroundContext.fillStyle = 'rgba(255,255,255,0.2)';
+    this.game.backgroundContext.beginPath();
+    this.game.backgroundContext.arc(
+      this.position.x + 20,
+      this.position.y - 100,
+      15,
+      0,
+      Math.PI * 2
     );
+    this.game.backgroundContext.fill();
+    this.game.backgroundContext.beginPath();
+    this.game.backgroundContext.arc(
+      this.position.x + 10,
+      this.position.y - 40,
+      35,
+      0,
+      Math.PI * 2
+    );
+    this.game.backgroundContext.fill();
+    this.game.backgroundContext.beginPath();
+    this.game.backgroundContext.arc(
+      this.position.x + 10,
+      this.position.y - 80,
+      25,
+      0,
+      Math.PI * 2
+    );
+    this.game.backgroundContext.fill();
   }
 
   drawRect(
