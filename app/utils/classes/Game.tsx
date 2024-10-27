@@ -235,6 +235,9 @@ class Game {
       this.canvas.clientWidth,
       this.canvas.clientHeight
     );
+
+    // render background canvas
+
     // render particules
     this.particles.forEach((dust) => {
       dust.draw(this.context);

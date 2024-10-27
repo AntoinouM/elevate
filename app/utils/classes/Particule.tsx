@@ -1,7 +1,7 @@
 import Game from './Game';
 import { Position } from './GameObject';
 
-class Particule {
+class Particle {
   _game: Game;
   _isActive: boolean;
   _position: Position;
@@ -58,7 +58,7 @@ class Particule {
   }
 }
 
-class Dust extends Particule {
+class Dust extends Particle {
   _color = 'rgba(255,255,255,0.5)';
 
   constructor(game: Game, x: number, y: number) {
