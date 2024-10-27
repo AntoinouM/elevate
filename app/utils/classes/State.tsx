@@ -1,4 +1,5 @@
-import Game, { GameConfig } from './Game';
+import Game from './Game';
+import { GameConfig } from '../utils';
 import { Dust } from './Particule';
 
 const states = {

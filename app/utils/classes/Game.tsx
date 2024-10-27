@@ -4,28 +4,8 @@ import { GameObject } from './GameObject';
 import Explosion from './Explosion';
 import { Dust } from './Particule';
 import ParticlesContainer from './ParticlesContainer';
+import { CONFIG, poolFunctions, randomNumberBetween } from '../utils';
 
-interface GameConfig {
-  HERO: {
-    width: number;
-    height: number;
-    velocity: number;
-  };
-  PLANET: {
-    diameter: number;
-    maximum: number;
-    fallingSpeed: number;
-    planetTimer: number;
-    planetMinInterval: number;
-    planetMaxInterval: number;
-  };
-  fps: number;
-  fpsInterval: number;
-  ground: number;
-  gravity: number;
-  impulseForce: number;
-  debug: boolean;
-}
 interface Freeable {
   free: boolean;
 }
@@ -62,46 +42,11 @@ class Game {
     this._explosionsPool = [];
     this._particles = [];
     this._keys = new Set();
-    this._config = {
-      HERO: {
-        width: 100,
-        height: 100,
-        velocity: 0.02,
-      },
-      PLANET: {
-        diameter: 24,
-        maximum: 12,
-        fallingSpeed: 0.08,
-        planetTimer: 0,
-        planetMinInterval: 2000,
-        planetMaxInterval: 800,
-      },
-      fps: 60,
-      fpsInterval: 1000 / 60,
-      ground: this.canvas.clientHeight - 100 / 1.5,
-      gravity: -0.001,
-      impulseForce: 0.62,
-      debug: false,
-    };
+    this._config = CONFIG;
+    this._config.ground = this.canvas.clientHeight - 100 / 1.5;
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
-    this._player = new Player(
-      this.config.HERO.width,
-      this.config.HERO.height,
-      this.canvas.clientWidth * 0.5,
-      this.config.ground,
-      this
-    );
-    this._cloudContainer1 = new ParticlesContainer(
-      this._backgroundCanvas.clientWidth * 0.3,
-      200,
-      this.randomNumberBetween(
-        0,
-        this.backgroundCanvas.clientWidth -
-          this._backgroundCanvas.clientWidth * 0.3
-      ),
-      this.randomNumberBetween(0, this.backgroundCanvas.clientHeight - 200),
-      this
-    );
+    this._player = this.createPlayer();
+    this._cloudContainer1 = this.createCloud();
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -161,47 +106,8 @@ class Game {
   init(): void {
     this.#gameObjects.set(this._player.id, this._player);
     this.#gameObjects.set(this._cloudContainer1.id, this._cloudContainer1);
-    this.createPlanetPool(this.config.PLANET.maximum);
-    this.createExplosionsPool(this.config.PLANET.maximum);
+    this.createPools();
     this.start();
-  }
-
-  createPlanetPool(max: number) {
-    for (let i = 0; i < max; i++) {
-      const planet = new Planet(
-        this.config.PLANET.diameter,
-        this.config.PLANET.diameter,
-        this
-      );
-      this.collectiblesPool.push(planet);
-      this.#gameObjects.set(planet.id, planet);
-    }
-  }
-
-  createExplosionsPool(max: number) {
-    for (let i = 0; i < max; i++) {
-      const explosion = new Explosion(
-        0,
-        0,
-        this.config.PLANET.diameter,
-        this.config.PLANET.diameter,
-        this
-      );
-      this.explosionsPool.push(explosion);
-      this.#gameObjects.set(explosion.id, explosion);
-    }
-  }
-
-  getFirstFreePlanetFromPool() {
-    for (let i: number = 0; i < this.collectiblesPool.length; i++) {
-      if (this.collectiblesPool[i].free) return this.collectiblesPool[i];
-    }
-  }
-
-  getFirstFreeExplosionFromPool() {
-    for (let i: number = 0; i < this.explosionsPool.length; i++) {
-      if (this.explosionsPool[i].free) return this.explosionsPool[i];
-    }
   }
 
   getFirstFreeElementFromPool<T extends Freeable>(pool: Array<T>) {
@@ -210,18 +116,11 @@ class Game {
     }
   }
 
-  executeOnPoolsArray<T, P>(
-    pool: Array<T>,
-    callback: (pool: Array<T>, params: P) => void,
-    params: P
-  ): void {
-    callback(pool, params);
-  }
-
   update(timeStamp: number): void {
     this.setDebugMode();
 
     this.#gameObjects.forEach((obj) => {
+      //console.log(obj + ' has free property: ' + Object.hasOwn(obj, '_free'));
       if (obj instanceof Planet || obj instanceof Explosion) {
         if (obj.free) {
           return;
@@ -240,18 +139,14 @@ class Game {
     });
 
     // create periodically planets
-    if (this.config.PLANET.planetTimer > this.config.PLANET.planetMaxInterval) {
-      const planet = this.getFirstFreePlanetFromPool();
-      planet?.activate();
-      this.config.PLANET.planetTimer = 0;
-    } else {
-      this.config.PLANET.planetTimer += timeStamp;
-    }
+    this.createPlanetObjects(timeStamp);
 
     // check for collision
     this.collectiblesPool.forEach((planet) => {
       if (planet.free || !this.objectAreColliding(this.player, planet)) return;
-      const explosion = this.getFirstFreeExplosionFromPool();
+      const explosion = poolFunctions.getFirstFreeElementFromPool<Explosion>(
+        this.explosionsPool
+      );
       if (explosion) {
         explosion.activate(planet.position.x, planet.position.y);
         this.#gameObjects.set(explosion.id, explosion);
@@ -358,12 +253,63 @@ class Game {
     return randomizedX;
   }
 
-  randomNumberBetween(
-    minRandomNumber: number,
-    maxRandomNumber: number
-  ): number {
-    return Math.floor(
-      Math.random() * (maxRandomNumber - minRandomNumber + 1) + minRandomNumber
+  createPlanetObjects(timeStamp: number) {
+    if (this.config.PLANET.planetTimer > this.config.PLANET.planetMaxInterval) {
+      const planet = poolFunctions.getFirstFreeElementFromPool<Planet>(
+        this.collectiblesPool
+      );
+      planet?.activate();
+      this.config.PLANET.planetTimer = 0;
+    } else {
+      this.config.PLANET.planetTimer += timeStamp;
+    }
+  }
+
+  createPools() {
+    poolFunctions.createPool(
+      this.config.PLANET.maximum,
+      Planet,
+      this.collectiblesPool,
+      this.#gameObjects,
+      this.config.PLANET.diameter,
+      this.config.PLANET.diameter,
+      this
+    );
+    poolFunctions.createPool(
+      this.config.PLANET.maximum,
+      Explosion,
+      this.explosionsPool,
+      this.#gameObjects,
+      this.config.PLANET.diameter,
+      this.config.PLANET.diameter,
+      this
+    );
+  }
+
+  createPlayer() {
+    return new Player(
+      this.config.HERO.width,
+      this.config.HERO.height,
+      this.canvas.clientWidth * 0.5,
+      this.config.ground,
+      this
+    );
+  }
+
+  createCloud() {
+    const width = this._backgroundCanvas.clientWidth * 0.3;
+    const height = this._backgroundCanvas.clientHeight * 0.3;
+    const minX = 0 + width * 0.5;
+    const maxX = this._backgroundCanvas.clientWidth - width;
+    const minY = 0 + height * 0.5;
+    const maxY = this._backgroundCanvas.clientHeight - height;
+
+    return new ParticlesContainer(
+      width,
+      height,
+      randomNumberBetween(minX, maxX),
+      randomNumberBetween(minY, maxY),
+      this
     );
   }
 
@@ -377,4 +323,4 @@ class Game {
 }
 
 export default Game;
-export type { GameConfig };
+export type { Freeable };

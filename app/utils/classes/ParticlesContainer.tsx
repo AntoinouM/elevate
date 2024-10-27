@@ -41,7 +41,7 @@ class ParticlesContainer extends GameObject {
       this.#isExpended === false
     ) {
       this.#isExpended = true;
-      this.width *= 2;
+      this.width = this.width * 2;
     } else {
       this.#isExpended = false;
       this.width = this.#originalWidth;

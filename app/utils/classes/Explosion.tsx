@@ -12,10 +12,8 @@ class Explosion extends GameObject {
   #angle: number;
   #imageReady: boolean = false;
 
-  constructor(x: number, y: number, width: number, height: number, game: Game) {
+  constructor(width: number, height: number, game: Game) {
     super(width, height, game);
-    this.position.x = x;
-    this.position.y = y;
     this._width = width;
     this._height = height;
     this._config = {
