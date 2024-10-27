@@ -91,7 +91,8 @@ class Rise extends State {
       new Dust(
         this.game,
         this.game.player.position.x,
-        this.game.player.position.y
+        this.game.player.position.y,
+        'rgba(255,255,255,0.5)'
       )
     );
     if (this.game.player.verticalForce >= 0)

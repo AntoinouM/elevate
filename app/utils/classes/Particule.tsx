@@ -8,12 +8,14 @@ class Particle {
   _size: number;
   _speedX: number;
   _speedY: number;
+  _color: string | undefined;
 
   constructor(game: Game) {
     this._game = game;
     this._isActive = true;
     this._position = { x: 0, y: 0 };
     this._size = this._speedX = this._speedY = 0;
+    this._color = undefined;
   }
 
   // GETTERS
@@ -35,6 +37,9 @@ class Particle {
   get size() {
     return this._size;
   }
+  get color() {
+    return this._color!;
+  }
 
   // SETTERS
   set size(int: number) {
@@ -49,6 +54,9 @@ class Particle {
   set speedY(int: number) {
     this._speedY = int;
   }
+  set color(color: string) {
+    this._color = color;
+  }
 
   update(timeStamp: number) {
     this.position.x -= (timeStamp * this.game.player._dx * this.speedX) / 30;
@@ -59,20 +67,14 @@ class Particle {
 }
 
 class Dust extends Particle {
-  _color = 'rgba(255,255,255,0.5)';
-
-  constructor(game: Game, x: number, y: number) {
+  constructor(game: Game, x: number, y: number, color: string) {
     super(game);
     this.position.x = x;
     this.position.y = y;
     this.size = Math.random() * 10 + 5;
     this.speedX = Math.random();
     this.speedY = Math.random();
-  }
-
-  // GETTERS
-  get color() {
-    return this._color;
+    this.color = color;
   }
 
   draw(context: CanvasRenderingContext2D) {
@@ -89,4 +91,16 @@ class Dust extends Particle {
   }
 }
 
-export { Dust };
+class Cloud extends Particle {
+  constructor(game: Game, x: number, y: number, color: string) {
+    super(game);
+    this.position.x = x;
+    this.position.y = y;
+    this.size = Math.random() * 10 + 5;
+    this.speedX = Math.random();
+    this.speedY = Math.random();
+    this.color = color;
+  }
+}
+
+export { Dust, Cloud };
