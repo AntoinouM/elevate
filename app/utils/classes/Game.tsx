@@ -114,7 +114,6 @@ class Game {
     this.setDebugMode();
 
     this.#gameObjects.forEach((obj) => {
-      //console.log(obj + ' has free property: ' + Object.hasOwn(obj, '_free'));
       if (obj instanceof Planet || obj instanceof Explosion) {
         if (obj.free) {
           return;

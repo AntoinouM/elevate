@@ -24,14 +24,14 @@ class ParticlesContainer extends GameObject {
   update(timeStamp: number): void {
     const bb = this.getBoundingBox();
     if (
-      bb.x <= 0 ||
-      bb.x + bb.width >= this.game.backgroundCanvas.clientWidth
+      bb.x <= -bb.width ||
+      bb.x + bb.width >= this.game.backgroundCanvas.clientWidth + bb.width
     ) {
       this._directionX *= -1;
     }
     if (
-      bb.y <= 0 ||
-      bb.y + bb.height >= this.game.backgroundCanvas.clientHeight
+      bb.y <= 0 - bb.height ||
+      bb.y + bb.height >= this.game.backgroundCanvas.clientHeight + bb.height
     ) {
       this._directionY *= -1;
     }
@@ -52,7 +52,7 @@ class ParticlesContainer extends GameObject {
   }
 
   render(): void {
-    this.game.backgroundContext.fillStyle = 'rgba(255,255,255,0.2)';
+    this.game.backgroundContext.fillStyle = '#3d3c3e';
     this.game.backgroundContext.beginPath();
     this.game.backgroundContext.arc(
       this.position.x + 20,
