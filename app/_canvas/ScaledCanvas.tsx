@@ -58,8 +58,10 @@ const ScaledCanvas: React.FC = () => {
 
   return (
     <>
-      <canvas ref={canvasBackground} className={canvas.background} />
-      <canvas ref={canvasRef} className={canvas.main} />
+      <div className={canvas.box}>
+        <canvas ref={canvasBackground} className={canvas.background} />
+        <canvas ref={canvasRef} className={canvas.main} />
+      </div>
     </>
   );
 };

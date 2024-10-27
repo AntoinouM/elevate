@@ -110,12 +110,6 @@ class Game {
     this.start();
   }
 
-  getFirstFreeElementFromPool<T extends Freeable>(pool: Array<T>) {
-    for (let i: number = 0; i < pool.length; i++) {
-      if (pool[i].free) return pool[i];
-    }
-  }
-
   update(timeStamp: number): void {
     this.setDebugMode();
 
@@ -239,18 +233,6 @@ class Game {
       // collision happened
       return true;
     } else return false;
-  }
-
-  randomXInCanvas(width: number, objectWidth: number): number {
-    let randomizedX = Math.floor(Math.random() * width);
-    if (objectWidth) {
-      if (randomizedX <= objectWidth) {
-        randomizedX = randomizedX + objectWidth;
-      } else if (randomizedX >= width - objectWidth) {
-        randomizedX = randomizedX - objectWidth;
-      }
-    }
-    return randomizedX;
   }
 
   createPlanetObjects(timeStamp: number) {
