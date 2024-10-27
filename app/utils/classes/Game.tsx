@@ -3,6 +3,7 @@ import Planet from './Planet';
 import { GameObject } from './GameObject';
 import Explosion from './Explosion';
 import { Dust } from './Particule';
+import ParticlesContainer from './ParticlesContainer';
 
 interface GameConfig {
   HERO: {
@@ -25,6 +26,9 @@ interface GameConfig {
   impulseForce: number;
   debug: boolean;
 }
+interface Freeable {
+  free: boolean;
+}
 
 class Game {
   _state: number = 0 | 1 | 2;
@@ -40,6 +44,7 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
+  _cloudContainer1: ParticlesContainer;
   #gameObjects = new Map<string, GameObject>();
 
   constructor(
@@ -86,7 +91,17 @@ class Game {
       this.config.ground,
       this
     );
-    this.#gameObjects.set(this._player.id, this._player);
+    this._cloudContainer1 = new ParticlesContainer(
+      this._backgroundCanvas.clientWidth * 0.3,
+      200,
+      this.randomNumberBetween(
+        0,
+        this.backgroundCanvas.clientWidth -
+          this._backgroundCanvas.clientWidth * 0.3
+      ),
+      this.randomNumberBetween(0, this.backgroundCanvas.clientHeight - 200),
+      this
+    );
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -144,6 +159,8 @@ class Game {
   }
 
   init(): void {
+    this.#gameObjects.set(this._player.id, this._player);
+    this.#gameObjects.set(this._cloudContainer1.id, this._cloudContainer1);
     this.createPlanetPool(this.config.PLANET.maximum);
     this.createExplosionsPool(this.config.PLANET.maximum);
     this.start();
@@ -187,7 +204,23 @@ class Game {
     }
   }
 
+  getFirstFreeElementFromPool<T extends Freeable>(pool: Array<T>) {
+    for (let i: number = 0; i < pool.length; i++) {
+      if (pool[i].free) return pool[i];
+    }
+  }
+
+  executeOnPoolsArray<T, P>(
+    pool: Array<T>,
+    callback: (pool: Array<T>, params: P) => void,
+    params: P
+  ): void {
+    callback(pool, params);
+  }
+
   update(timeStamp: number): void {
+    this.setDebugMode();
+
     this.#gameObjects.forEach((obj) => {
       if (obj instanceof Planet || obj instanceof Explosion) {
         if (obj.free) {
@@ -235,8 +268,12 @@ class Game {
       this.canvas.clientWidth,
       this.canvas.clientHeight
     );
-
-    // render background canvas
+    this.backgroundContext.clearRect(
+      0,
+      0,
+      this.canvas.clientWidth,
+      this.canvas.clientHeight
+    );
 
     // render particules
     this.particles.forEach((dust) => {
@@ -319,6 +356,23 @@ class Game {
       }
     }
     return randomizedX;
+  }
+
+  randomNumberBetween(
+    minRandomNumber: number,
+    maxRandomNumber: number
+  ): number {
+    return Math.floor(
+      Math.random() * (maxRandomNumber - minRandomNumber + 1) + minRandomNumber
+    );
+  }
+
+  setDebugMode() {
+    if (this.keys.has('d')) {
+      this.config.debug = true;
+    } else {
+      this.config.debug = false;
+    }
   }
 }
 

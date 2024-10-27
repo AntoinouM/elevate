@@ -42,6 +42,14 @@ class GameObject {
     return this._id;
   }
 
+  // SETTERS
+  set width(int: number) {
+    this._width = int;
+  }
+  set height(int: number) {
+    this._height = int;
+  }
+
   init(): void {}
   /* eslint-disable @typescript-eslint/no-unused-vars */
   update(timeStamp: number): void {
