@@ -129,7 +129,7 @@ class ContainedParticle extends Particle {
     super(game);
     this.position.x = container.getBoundingBox().x + x; // Start relative to container position
     this.position.y = container.getBoundingBox().y + y; // Start relative to container position
-    this.size = randomNumberBetween(10, 35);
+    this.size = randomNumberBetween(10, 25);
     this.width = this.height = this.size * 2;
     this.speedX = Math.random();
     this.speedY = Math.random();
@@ -267,7 +267,7 @@ class ContainedParticle extends Particle {
     const normalizedY = distanceY / distanceToCenter;
 
     // Move particle towards the center with a smoothing factor
-    const smoothingFactor = 0.03; // Adjust as needed for smoothness
+    const smoothingFactor = 0.02; // Adjust as needed for smoothness
     this.position.x +=
       normalizedX * this.speedX * timeStamp * smoothingFactor + deltaX;
     this.position.y +=

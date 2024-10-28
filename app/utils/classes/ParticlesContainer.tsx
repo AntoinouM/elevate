@@ -59,10 +59,10 @@ class ParticlesContainer extends GameObject {
     for (let i: number = 0; i < this.#numberOfParticles; i++) {
       const cloudParticle = new ContainedParticle(
         this.game,
-        randomNumberBetween(0, this.width), // relative position inside the container
-        randomNumberBetween(0, this.height), // relative position inside the container
+        randomNumberBetween(0 + 15, this.width - 15), // relative position inside the container
+        randomNumberBetween(0 + 15, this.height - 15), // relative position inside the container
         this,
-        '#3d3c3e'
+        'rgba(44, 50, 99, 0.4)'
       );
       this.particles.push(cloudParticle);
     }
