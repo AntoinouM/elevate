@@ -290,6 +290,7 @@ class Game {
       height,
       randomNumberBetween(minX, maxX),
       randomNumberBetween(minY, maxY),
+      60,
       this
     );
   }

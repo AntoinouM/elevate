@@ -1,3 +1,4 @@
+import { randomNumberBetween } from '../utils';
 import Game from './Game';
 import { GameObject } from './GameObject';
 
@@ -42,7 +43,11 @@ class Planet extends GameObject {
 
   init(): void {
     this.position.x = Math.random() * this.game.canvas.clientWidth;
-    this.position.y = 0;
+    this.position.x = randomNumberBetween(
+      this.width * 0.5,
+      this.game.canvas.clientWidth - this.width * 0.5
+    );
+    this.position.y = -this.width;
 
     this.game.context.strokeStyle = 'pink';
     this.game.context.lineWidth = 1.5;

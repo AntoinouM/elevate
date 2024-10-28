@@ -88,5 +88,38 @@ const CONFIG = {
   debug: false,
 };
 
-export { poolFunctions, randomNumberBetween, CONFIG };
+function callbackOnBoundariesCheck<T, O, C>(
+  objToContain: GameObject,
+  containerObject: GameObject,
+  axis: string,
+  callback: (params: T | null) => void,
+  params: T | null
+): void {
+  const object = objToContain.getBoundingBox();
+  const container = containerObject.getBoundingBox();
+
+  switch (axis) {
+    case 'x':
+      if (
+        object.x <= 0 + object.width ||
+        object.x + object.width >= container.width
+      )
+        callback(params);
+      break;
+    case 'y':
+      if (
+        object.y <= 0 + object.height ||
+        object.y + object.height >= container.height
+      )
+        callback(params);
+      break;
+  }
+}
+
+export {
+  poolFunctions,
+  randomNumberBetween,
+  CONFIG,
+  callbackOnBoundariesCheck,
+};
 export type { GameConfig };
