@@ -79,6 +79,8 @@ class Particle {
 }
 
 class Dust extends Particle {
+  private initialDirectionX: number;
+
   constructor(game: Game, x: number, y: number, color: string) {
     super(game);
     this.position.x = x;
@@ -88,12 +90,15 @@ class Dust extends Particle {
     this.speedX = Math.random();
     this.speedY = Math.random();
     this.color = color;
+
+    // Capture the player's initial direction (1 or -1) at creation time
+    this.initialDirectionX = game.player._dx;
   }
 
   draw(context: CanvasRenderingContext2D) {
     context.beginPath();
     context.arc(
-      this.position.x - this.game.player.width * 0.15 * this.game.player._dx,
+      this.position.x - this.game.player.width * 0.15 * this.initialDirectionX,
       this.position.y + this.game.player.height * 0.1,
       this.size,
       0,
@@ -104,10 +109,10 @@ class Dust extends Particle {
   }
 
   update(timeStamp: number) {
-    this.position.x -= (timeStamp * this.game.player._dx * this.speedX) / 30;
+    this.position.x -= (timeStamp * this.initialDirectionX * this.speedX) / 30;
     this.position.y += (timeStamp * this.speedY) / 30;
-    this.size *= 0.92;
-    if (this.size < 0.5) this.isActive = false;
+    this.size *= 0.85;
+    if (this.size < 0.1) this.isActive = false;
   }
 }
 
@@ -227,7 +232,7 @@ class ContainedParticle extends Particle {
     const container = containerObj.getBoundingBox();
     if (
       this.position.x >= container.x &&
-      this.position.x <= container.x + this._container._originalWidth &&
+      this.position.x <= container.x + this._container.width &&
       this.position.y >= container.y &&
       this.position.y <= container.y + container.height
     ) {
@@ -259,7 +264,7 @@ class ContainedParticle extends Particle {
     const normalizedY = distanceY / distanceToCenter;
 
     // Move particle towards the center with a smoothing factor
-    const smoothingFactor = 0.01; // Adjust as needed for smoothness
+    const smoothingFactor = 0.03; // Adjust as needed for smoothness
     this.position.x +=
       normalizedX * this.speedX * timeStamp * smoothingFactor + deltaX;
     this.position.y +=
