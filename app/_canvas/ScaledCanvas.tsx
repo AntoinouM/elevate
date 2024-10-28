@@ -45,6 +45,9 @@ const ScaledCanvas: React.FC = () => {
 
     // Set up resize event listener
     window.addEventListener('resize', updateDimension);
+    window.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    });
 
     // Initialize the game
     const game = new Game(canvas, context, canvasBg, contextBg);
