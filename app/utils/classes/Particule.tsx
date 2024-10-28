@@ -143,10 +143,13 @@ class ContainedParticle extends Particle {
 
   update(timeStamp: number) {
     let deltaX, deltaY;
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    this._container.delta.x ? (deltaX = this._container.delta.x) : (deltaX = 0);
-    this._container.delta.y ? (deltaY = this._container.delta.y) : (deltaY = 0);
-    /* eslint-enable @typescript-eslint/no-unused-vars */
+    if (this._container.delta.x && this._container.delta.y) {
+      deltaX = this._container.delta.x;
+      deltaY = this._container.delta.y;
+    } else {
+      deltaX = 0;
+      deltaY = 0;
+    }
 
     // Check boundaries and ensure particles stay within the container
     this.clampInContainer(this._container);
