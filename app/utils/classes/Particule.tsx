@@ -115,7 +115,6 @@ class ContainedParticle extends Particle {
   _container: ParticlesContainer;
   _directionX: number;
   _directionY: number;
-  _originalSpeedX: number;
 
   constructor(
     game: Game,
@@ -127,11 +126,10 @@ class ContainedParticle extends Particle {
     super(game);
     this.position.x = container.getBoundingBox().x + x; // Start relative to container position
     this.position.y = container.getBoundingBox().y + y; // Start relative to container position
-    this.size = randomNumberBetween(10, 25);
+    this.size = randomNumberBetween(10, 35);
     this.width = this.height = this.size * 2;
     this.speedX = Math.random();
     this.speedY = Math.random();
-    this._originalSpeedX = this.speedX;
     this.color = color;
     this._container = container;
 
@@ -202,15 +200,12 @@ class ContainedParticle extends Particle {
       this.position.y >= player.y &&
       this.position.y <= player.y + player.height
     ) {
-      this.speedX *= 2.5;
       // check which border is closer
       let isCloserToRightSide =
         this.position.x - player.x > player.x + player.width - this.position.x;
       // change direction to closer side
-      if (isCloserToRightSide && this._directionX === -1) this._directionX = 1;
-      if (!isCloserToRightSide && this._directionX === 1) this._directionX = -1;
-    } else {
-      this.speedX = this._originalSpeedX;
+      if (isCloserToRightSide) this.position.x = player.x + player.width;
+      if (!isCloserToRightSide) this.position.x = player.x;
     }
   }
 
