@@ -14,8 +14,8 @@ class Game {
   _state: number = 0 | 1 | 2;
   _canvas;
   _context;
-  _backgroundCanvas;
-  _backgroundContext;
+  // _backgroundCanvas;
+  // _backgroundContext;
   _lastTickTimestamp = 0;
   _collectiblesPool: Planet[];
   _explosionsPool: Explosion[];
@@ -24,19 +24,19 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  _cloudContainer1: ParticlesContainer;
+  // _cloudContainer1: ParticlesContainer;
   #gameObjects = new Map<string, GameObject>();
 
   constructor(
     canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
+    context: CanvasRenderingContext2D /*,
     backgroundCanvas: HTMLCanvasElement,
-    backgroundContext: CanvasRenderingContext2D
+    backgroundContext: CanvasRenderingContext2D*/
   ) {
     this._canvas = canvas;
     this._context = context;
-    this._backgroundCanvas = backgroundCanvas;
-    this._backgroundContext = backgroundContext;
+    // this._backgroundCanvas = backgroundCanvas;
+    // this._backgroundContext = backgroundContext;
     this._state = 0;
     this._collectiblesPool = [];
     this._explosionsPool = [];
@@ -46,7 +46,7 @@ class Game {
     this._config.ground = this.canvas.clientHeight - 100 / 1.5;
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this._player = this.createPlayer();
-    this._cloudContainer1 = this.createCloud();
+    // this._cloudContainer1 = this.createCloud();
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -67,12 +67,12 @@ class Game {
   get context() {
     return this._context;
   }
-  get backgroundCanvas() {
-    return this._backgroundCanvas;
-  }
-  get backgroundContext() {
-    return this._backgroundContext;
-  }
+  // get backgroundCanvas() {
+  //   return this._backgroundCanvas;
+  // }
+  // get backgroundContext() {
+  //   return this._backgroundContext;
+  // }
   get lastTickTimestamp() {
     return this._lastTickTimestamp;
   }
@@ -105,7 +105,7 @@ class Game {
 
   init(): void {
     this.#gameObjects.set(this._player.id, this._player);
-    this.#gameObjects.set(this._cloudContainer1.id, this._cloudContainer1);
+    // this.#gameObjects.set(this._cloudContainer1.id, this._cloudContainer1);
     this.createPools();
     this.start();
   }
@@ -156,12 +156,12 @@ class Game {
       this.canvas.clientWidth,
       this.canvas.clientHeight
     );
-    this.backgroundContext.clearRect(
-      0,
-      0,
-      this.canvas.clientWidth,
-      this.canvas.clientHeight
-    );
+    // this.backgroundContext.clearRect(
+    //   0,
+    //   0,
+    //   this.canvas.clientWidth,
+    //   this.canvas.clientHeight
+    // );
 
     // render particules
     this.particles.forEach((dust) => {
@@ -277,22 +277,22 @@ class Game {
     );
   }
 
-  createCloud() {
-    const width = this._backgroundCanvas.clientWidth * 0.3;
-    const height = this._backgroundCanvas.clientHeight * 0.3;
-    const minX = 0 + width * 0.5;
-    const maxX = this._backgroundCanvas.clientWidth - width;
-    const minY = 0 + height * 0.5;
-    const maxY = this._backgroundCanvas.clientHeight - height;
+  // createCloud() {
+  //   const width = this._backgroundCanvas.clientWidth * 0.3;
+  //   const height = this._backgroundCanvas.clientHeight * 0.3;
+  //   const minX = 0 + width * 0.5;
+  //   const maxX = this._backgroundCanvas.clientWidth - width;
+  //   const minY = 0 + height * 0.5;
+  //   const maxY = this._backgroundCanvas.clientHeight - height;
 
-    return new ParticlesContainer(
-      width,
-      height,
-      randomNumberBetween(minX, maxX),
-      randomNumberBetween(minY, maxY),
-      this
-    );
-  }
+  //   return new ParticlesContainer(
+  //     width,
+  //     height,
+  //     randomNumberBetween(minX, maxX),
+  //     randomNumberBetween(minY, maxY),
+  //     this
+  //   );
+  // }
 
   setDebugMode() {
     if (this.keys.has('d')) {

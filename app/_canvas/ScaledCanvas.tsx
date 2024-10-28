@@ -26,19 +26,19 @@ const ScaledCanvas: React.FC = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const canvasBg = canvasBackground.current;
+    // const canvasBg = canvasBackground.current;
 
-    if (!canvas || !canvasBg) return; // TypeScript safety check
+    if (!canvas /*|| !canvasBg*/) return; // TypeScript safety check
 
     const context = canvas.getContext('2d');
-    const contextBg = canvasBg.getContext('2d');
-    if (!context || !contextBg) return; // TypeScript safety check
+    // const contextBg = canvasBg.getContext('2d');
+    if (!context /*|| !contextBg*/) return; // TypeScript safety check
 
     const updateDimension = (): void => {
       widthRef.current = canvas.clientWidth;
       heightRef.current = canvas.clientHeight;
       setupCanvas(canvas, context, widthRef.current, heightRef.current);
-      setupCanvas(canvasBg, contextBg, widthRef.current, heightRef.current);
+      // setupCanvas(canvasBg, contextBg, widthRef.current, heightRef.current);
     };
 
     updateDimension(); // Set initial dimensions
@@ -47,7 +47,7 @@ const ScaledCanvas: React.FC = () => {
     window.addEventListener('resize', updateDimension);
 
     // Initialize the game
-    const game = new Game(canvas, context, canvasBg, contextBg);
+    const game = new Game(canvas, context /*, canvasBg, contextBg*/);
     console.log(game);
 
     // Clean up the event listener on unmount
@@ -58,7 +58,7 @@ const ScaledCanvas: React.FC = () => {
 
   return (
     <>
-      <canvas ref={canvasBackground} className={canvas.background} />
+      {/* <canvas ref={canvasBackground} className={canvas.background} /> */}
       <canvas ref={canvasRef} className={canvas.main} />
     </>
   );
