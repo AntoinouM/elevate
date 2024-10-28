@@ -137,16 +137,16 @@ class ContainedParticle extends Particle {
     this._container = container;
 
     // Randomization of direction
-    /* eslint-disable @typescript-eslint/no-unused-vars */
     this._directionX = Math.random() < 0.5 ? -1 : 1;
     this._directionY = Math.random() < 0.5 ? -1 : 1;
-    /* eslint-enable @typescript-eslint/no-unused-vars */
   }
 
   update(timeStamp: number) {
     let deltaX, deltaY;
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     this._container.delta.x ? (deltaX = this._container.delta.x) : (deltaX = 0);
     this._container.delta.y ? (deltaY = this._container.delta.y) : (deltaY = 0);
+    /* eslint-enable @typescript-eslint/no-unused-vars */
 
     // Check boundaries and ensure particles stay within the container
     this.clampInContainer(this._container);
