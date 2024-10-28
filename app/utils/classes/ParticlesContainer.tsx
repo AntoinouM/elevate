@@ -18,7 +18,6 @@ class ParticlesContainer extends GameObject {
   #numberOfParticles: number;
   _lastPosition: UndefinedPosition;
   _delta: Position;
-  _isVisible: boolean;
 
   constructor(
     width: number,
@@ -40,7 +39,6 @@ class ParticlesContainer extends GameObject {
     this._particles = [];
     this._lastPosition = { x: undefined, y: undefined };
     this._delta = { x: 0, y: 0 };
-    this._isVisible = true;
 
     this.init();
   }
@@ -72,8 +70,6 @@ class ParticlesContainer extends GameObject {
 
   update(timeStamp: number): void {
     const bb = this.getBoundingBox();
-    let xIsIn: number = 1;
-    let yIsIn: number = 1;
 
     this.delta.x = this.position.x - this.lastPosition.x!;
     this.delta.y = this.position.y - this.lastPosition.y!;
@@ -89,17 +85,13 @@ class ParticlesContainer extends GameObject {
       bb.x + this.width >= this.game.backgroundCanvas.clientWidth + this.width
     ) {
       this._directionX *= -1;
-      xIsIn = 0;
     }
     if (
       bb.y <= 0 - bb.height ||
       bb.y + bb.height >= this.game.backgroundCanvas.clientHeight + bb.height
     ) {
       this._directionY *= -1;
-      yIsIn = 0;
     }
-
-    xIsIn * yIsIn === 1 ? (this._isVisible = true) : (this._isVisible = false);
 
     // save last position
     this.lastPosition.x = this.position.x;

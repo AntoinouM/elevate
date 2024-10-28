@@ -74,8 +74,6 @@ class Particle {
   set height(height: number) {
     this._height = height;
   }
-
-  update(timeStamp: number) {}
 }
 
 class Dust extends Particle {
@@ -139,8 +137,10 @@ class ContainedParticle extends Particle {
     this._container = container;
 
     // Randomization of direction
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     this._directionX = Math.random() < 0.5 ? -1 : 1;
     this._directionY = Math.random() < 0.5 ? -1 : 1;
+    /* eslint-enable @typescript-eslint/no-unused-vars */
   }
 
   update(timeStamp: number) {
@@ -206,7 +206,7 @@ class ContainedParticle extends Particle {
       this.position.y <= player.y + player.height
     ) {
       // check which border is closer
-      let isCloserToRightSide =
+      const isCloserToRightSide =
         this.position.x - player.x > player.x + player.width - this.position.x;
       // change direction to closer side
       if (isCloserToRightSide) this.position.x = player.x + player.width;
