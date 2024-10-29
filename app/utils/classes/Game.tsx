@@ -47,6 +47,8 @@ class Game {
     this._keys = new Set();
     this._config = CONFIG;
     this._config.ground = this.canvas.clientHeight - 100 / 1.5;
+    this.config.HERO.height = this.config.HERO.width =
+      this.canvas.clientHeight * 0.12;
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this._player = this.createPlayer();
     this._cloudContainer1 = this.createCloud();
