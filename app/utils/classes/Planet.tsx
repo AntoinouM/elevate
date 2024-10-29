@@ -4,6 +4,7 @@ import { GameObject } from './GameObject';
 
 class Planet extends GameObject {
   _free: boolean;
+  #fallAccelerator: number = 1;
 
   constructor(width: number, height: number, game: Game) {
     super(width, height, game);
@@ -56,7 +57,7 @@ class Planet extends GameObject {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(timeStamp: number): void {
     if (this.free) return;
-    this.position.y! += this.game.config.PLANET.fallingSpeed * timeStamp;
+    this.position.y! += this.game.config.PLANET.fallingSpeed * timeStamp * 1.6;
 
     if (this.position.y! > this.game.canvas.clientHeight + this.width * 0.5)
       this.reset();

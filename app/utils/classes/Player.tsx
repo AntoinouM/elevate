@@ -156,6 +156,9 @@ class Player extends GameObject {
         this._imageOptions.maxFrame
     );
 
+    this._positionYPercent =
+      100 - (this.getBoundingBox().y / this.game.canvas.clientHeight) * 100;
+
     // draw player
     this.draw(
       this.game.context,
@@ -248,7 +251,7 @@ class Player extends GameObject {
 
     // movement implementation
     this.position.x! +=
-      timeStamp * this._dx * this._velocity * (this._pointerDistance / 8);
+      timeStamp * this._dx * this._velocity * (this._pointerDistance / 4);
 
     // update Y position
     this.updateYPosition(timeStamp);

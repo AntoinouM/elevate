@@ -168,6 +168,20 @@ class Game {
       dust.draw(this.context);
     });
 
+    // draw ground
+    this.context.fillStyle = '#252839';
+    this.context.fillRect(
+      0,
+      this.config.ground,
+      this.canvas.clientWidth,
+      this.canvas.clientHeight - this.config.ground
+    );
+    this.context.strokeStyle = '#f5f5f5';
+    this.context.beginPath();
+    this.context.moveTo(0, this.config.ground);
+    this.context.lineTo(this.canvas.clientWidth, this.config.ground);
+    this.context.stroke();
+
     // Ensure you render the collectibles
     this.#gameObjects.forEach((obj) => {
       if (obj instanceof Planet || obj instanceof Explosion) {

@@ -109,7 +109,7 @@ class Dust extends Particle {
   update(timeStamp: number) {
     this.position.x -= (timeStamp * this.initialDirectionX * this.speedX) / 30;
     this.position.y += (timeStamp * this.speedY) / 30;
-    this.size *= 0.85;
+    this.size *= 0.875;
     if (this.size < 0.1) this.isActive = false;
   }
 }
@@ -267,7 +267,7 @@ class ContainedParticle extends Particle {
     const normalizedY = distanceY / distanceToCenter;
 
     // Move particle towards the center with a smoothing factor
-    const smoothingFactor = 0.02; // Adjust as needed for smoothness
+    const smoothingFactor = 0.025; // Adjust as needed for smoothness
     this.position.x +=
       normalizedX * this.speedX * timeStamp * smoothingFactor + deltaX;
     this.position.y +=
