@@ -5,6 +5,7 @@ import Explosion from './Explosion';
 import { Dust } from './Particule';
 import ParticlesContainer from './ParticlesContainer';
 import { CONFIG, poolFunctions, randomNumberBetween } from '../utils';
+import { GameBefore, GameEnded, GameOnGoing } from './GameStates';
 
 interface Freeable {
   free: boolean;
@@ -26,6 +27,10 @@ class Game {
   _cloudContainer1: ParticlesContainer;
   #gameObjects = new Map<string, GameObject>();
 
+  // state
+  _states: GameBefore[] | GameOnGoing[] | GameEnded[];
+  _currentState: GameBefore | GameOnGoing | GameEnded;
+
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
@@ -45,6 +50,15 @@ class Game {
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this._player = this.createPlayer();
     this._cloudContainer1 = this.createCloud();
+
+    // states
+    this._states = [
+      new GameBefore(this),
+      new GameOnGoing(this),
+      new GameEnded(this),
+    ];
+    this._currentState = this._states[0];
+
     this.init();
 
     window.addEventListener('keydown', (e) => {
@@ -89,6 +103,12 @@ class Game {
   get particles() {
     return this._particles;
   }
+  get states() {
+    return this._states;
+  }
+  get currentState() {
+    return this._currentState;
+  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
@@ -96,6 +116,9 @@ class Game {
   }
   set player(player: Player) {
     this._player = player as Player;
+  }
+  set currentState(state: GameBefore | GameEnded | GameOnGoing) {
+    this._currentState = state;
   }
 
   init(): void {
@@ -310,6 +333,11 @@ class Game {
     } else {
       this.config.debug = false;
     }
+  }
+
+  setState(int: number) {
+    this.currentState = this.states[int];
+    this.currentState.start();
   }
 }
 

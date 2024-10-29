@@ -41,18 +41,24 @@ class GameBefore extends GameStates {
   constructor(game: Game) {
     super('BEFORE', game);
   }
+
+  start() {}
 }
 
 class GameOnGoing extends GameStates {
   constructor(game: Game) {
     super('ONGOING', game);
   }
+
+  start() {}
 }
 
 class GameEnded extends GameStates {
   constructor(game: Game) {
     super('ENDED', game);
   }
+
+  start() {}
 }
 
 export { GameBefore, GameEnded, GameOnGoing };
