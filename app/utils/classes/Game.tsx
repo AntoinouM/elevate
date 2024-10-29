@@ -11,7 +11,6 @@ interface Freeable {
 }
 
 class Game {
-  _state: number = 0 | 1 | 2;
   _canvas;
   _context;
   _backgroundCanvas;
@@ -37,7 +36,6 @@ class Game {
     this._context = context;
     this._backgroundCanvas = backgroundCanvas;
     this._backgroundContext = backgroundContext;
-    this._state = 0;
     this._collectiblesPool = [];
     this._explosionsPool = [];
     this._particles = [];
@@ -58,9 +56,6 @@ class Game {
   }
 
   // GETTERS
-  get state() {
-    return this._state;
-  }
   get canvas() {
     return this._canvas;
   }
