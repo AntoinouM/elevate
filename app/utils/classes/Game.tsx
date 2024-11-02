@@ -1,5 +1,4 @@
 import Player from './Player';
-import { GameObject } from './GameObject';
 import { CONFIG } from '../utils';
 import { GameBefore, GameEnded, GameOnGoing } from './GameStates';
 
