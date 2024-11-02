@@ -87,7 +87,7 @@ class Rise extends State {
   }
   /* eslint-disable @typescript-eslint/no-unused-vars */
   handleStateChange(position: Position, config: GameConfig) {
-    this.game.particles.push(
+    this.game.player.particles.push(
       new Dust(
         this.game,
         this.game.player.position.x,

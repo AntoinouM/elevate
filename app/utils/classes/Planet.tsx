@@ -3,24 +3,12 @@ import Game from './Game';
 import { GameObject } from './GameObject';
 
 class Planet extends GameObject {
-  _free: boolean;
   #fallAccelerator: number = 1;
 
   constructor(width: number, height: number, game: Game) {
     super(width, height, game);
-    this._free = true;
 
     this.init();
-  }
-
-  // GETTERS
-  get free(): boolean {
-    return this._free;
-  }
-
-  // SETTERS
-  set free(bool: boolean) {
-    this._free = bool;
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

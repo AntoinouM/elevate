@@ -94,6 +94,7 @@ class Dust extends Particle {
   }
 
   draw(context: CanvasRenderingContext2D) {
+    if (!this.isActive) return;
     context.beginPath();
     context.arc(
       this.position.x - this.game.player.width * 0.15 * this.initialDirectionX,
@@ -107,6 +108,7 @@ class Dust extends Particle {
   }
 
   update(timeStamp: number) {
+    if (!this.isActive) return;
     this.position.x -= (timeStamp * this.initialDirectionX * this.speedX) / 30;
     this.position.y += (timeStamp * this.speedY) / 30;
     this.size *= 0.875;
@@ -275,4 +277,4 @@ class ContainedParticle extends Particle {
   }
 }
 
-export { Dust, ContainedParticle };
+export { Dust, ContainedParticle, Particle };

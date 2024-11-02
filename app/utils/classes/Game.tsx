@@ -17,14 +17,10 @@ class Game {
   _backgroundCanvas;
   _backgroundContext;
   _lastTickTimestamp = 0;
-  _collectiblesPool: Planet[];
-  _explosionsPool: Explosion[];
-  _particles: Dust[];
   _config;
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  _cloudContainer1: ParticlesContainer;
   #gameObjects = new Map<string, GameObject>();
 
   // state
@@ -41,9 +37,6 @@ class Game {
     this._context = context;
     this._backgroundCanvas = backgroundCanvas;
     this._backgroundContext = backgroundContext;
-    this._collectiblesPool = [];
-    this._explosionsPool = [];
-    this._particles = [];
     this._keys = new Set();
     this._config = CONFIG;
     this._config.ground = this.canvas.clientHeight - 100 / 1.5;
@@ -51,7 +44,6 @@ class Game {
       this.canvas.clientHeight * 0.12;
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this._player = this.createPlayer();
-    this._cloudContainer1 = this.createCloud();
 
     // states
     this._states = [
@@ -59,7 +51,7 @@ class Game {
       new GameOnGoing(this),
       new GameEnded(this),
     ];
-    this._currentState = this._states[0];
+    this._currentState = this._states[1];
 
     this.init();
 
@@ -87,12 +79,6 @@ class Game {
   get lastTickTimestamp() {
     return this._lastTickTimestamp;
   }
-  get collectiblesPool() {
-    return this._collectiblesPool;
-  }
-  get explosionsPool() {
-    return this._explosionsPool;
-  }
   get config() {
     return this._config;
   }
@@ -101,9 +87,6 @@ class Game {
   }
   get keys() {
     return this._keys;
-  }
-  get particles() {
-    return this._particles;
   }
   get states() {
     return this._states;
@@ -124,96 +107,19 @@ class Game {
   }
 
   init(): void {
-    this.#gameObjects.set(this._player.id, this._player);
-    this.#gameObjects.set(this._cloudContainer1.id, this._cloudContainer1);
-    this.createPools();
     this.start();
   }
 
   update(timeStamp: number): void {
     this.setDebugMode();
 
-    this.#gameObjects.forEach((obj) => {
-      if (obj instanceof Planet || obj instanceof Explosion) {
-        if (obj.free) {
-          return;
-        } else {
-          obj.update(timeStamp);
-        }
-      } else {
-        obj.update(timeStamp);
-      }
-    });
-
-    // update particules
-    this.particles.forEach((dust, index) => {
-      dust.update(timeStamp);
-      if (!dust.isActive) this.particles.splice(index, 1);
-    });
-
-    // create periodically planets
-    this.createPlanetObjects(timeStamp);
-
-    // check for collision
-    this.collectiblesPool.forEach((planet) => {
-      if (planet.free || !this.objectAreColliding(this.player, planet)) return;
-      const explosion = poolFunctions.getFirstFreeElementFromPool<Explosion>(
-        this.explosionsPool
-      );
-      if (explosion) {
-        explosion.activate(planet.position.x, planet.position.y);
-        this.#gameObjects.set(explosion.id, explosion);
-      }
-      this.player.verticalForce = -this.config.impulseForce;
-      planet.reset();
-    });
+    this.currentState.update(timeStamp);
   }
 
   render(): void {
-    this.context.clearRect(
-      0,
-      0,
-      this.canvas.clientWidth,
-      this.canvas.clientHeight
-    );
-    this.backgroundContext.clearRect(
-      0,
-      0,
-      this.canvas.clientWidth,
-      this.canvas.clientHeight
-    );
+    this.clearCanvases([this.canvas, this.backgroundCanvas]);
 
-    // render particules
-    this.particles.forEach((dust) => {
-      dust.draw(this.context);
-    });
-
-    // draw ground
-    this.context.fillStyle = '#252839';
-    this.context.fillRect(
-      0,
-      this.config.ground,
-      this.canvas.clientWidth,
-      this.canvas.clientHeight - this.config.ground
-    );
-    this.context.strokeStyle = '#f5f5f5';
-    this.context.beginPath();
-    this.context.moveTo(0, this.config.ground);
-    this.context.lineTo(this.canvas.clientWidth, this.config.ground);
-    this.context.stroke();
-
-    // Ensure you render the collectibles
-    this.#gameObjects.forEach((obj) => {
-      if (obj instanceof Planet || obj instanceof Explosion) {
-        if (obj.free) {
-          return;
-        } else {
-          obj.render();
-        }
-      } else {
-        obj.render();
-      }
-    });
+    this.currentState.render();
 
     // debug mode
     if (!this.config.debug) return;
@@ -251,56 +157,6 @@ class Game {
     requestAnimationFrame(gameLoop);
   }
 
-  end(): void {}
-
-  objectAreColliding(object1: GameObject, object2: GameObject): boolean {
-    const bbA = object1.getBoundingBox();
-    const bbB = object2.getBoundingBox();
-
-    if (
-      bbA.x < bbB.x + bbB.width &&
-      bbA.x + bbA.width > bbB.x &&
-      bbA.y < bbB.y + bbB.height &&
-      bbA.y + bbA.height > bbB.y
-    ) {
-      // collision happened
-      return true;
-    } else return false;
-  }
-
-  createPlanetObjects(timeStamp: number) {
-    if (this.config.PLANET.planetTimer > this.config.PLANET.planetMaxInterval) {
-      const planet = poolFunctions.getFirstFreeElementFromPool<Planet>(
-        this.collectiblesPool
-      );
-      planet?.activate();
-      this.config.PLANET.planetTimer = 0;
-    } else {
-      this.config.PLANET.planetTimer += timeStamp;
-    }
-  }
-
-  createPools() {
-    poolFunctions.createPool(
-      this.config.PLANET.maximum,
-      Planet,
-      this.collectiblesPool,
-      this.#gameObjects,
-      this.config.PLANET.diameter,
-      this.config.PLANET.diameter,
-      this
-    );
-    poolFunctions.createPool(
-      this.config.PLANET.maximum,
-      Explosion,
-      this.explosionsPool,
-      this.#gameObjects,
-      this.config.PLANET.diameter,
-      this.config.PLANET.diameter,
-      this
-    );
-  }
-
   createPlayer() {
     return new Player(
       this.config.HERO.width,
@@ -311,22 +167,11 @@ class Game {
     );
   }
 
-  createCloud() {
-    const width = this._backgroundCanvas.clientWidth * 0.3;
-    const height = this._backgroundCanvas.clientHeight * 0.3;
-    const minX = 0 + width * 0.5;
-    const maxX = this._backgroundCanvas.clientWidth - width;
-    const minY = 0 + height * 0.5;
-    const maxY = this._backgroundCanvas.clientHeight - height;
-
-    return new ParticlesContainer(
-      width,
-      height,
-      randomNumberBetween(minX, maxX),
-      randomNumberBetween(minY, maxY),
-      75,
-      this
-    );
+  clearCanvases(canvases: HTMLCanvasElement[]) {
+    canvases.forEach((canvas) => {
+      const context = canvas.getContext('2d');
+      context!.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    });
   }
 
   setDebugMode() {

@@ -1,6 +1,7 @@
 import Game from './Game';
 import { BoundingBox, GameObject } from './GameObject';
 import { Fly, Idle, Rise, Walk } from './State';
+import { Dust } from './Particule';
 
 interface Position {
   x: number;
@@ -18,6 +19,7 @@ class Player extends GameObject {
   _states: Idle[] | Walk[] | Rise[] | Fly[];
   _currentState: Idle | Walk | Rise | Fly;
   _verticalForce: number = 0;
+  _particles: Dust[];
 
   // animation
   _image;
@@ -33,11 +35,11 @@ class Player extends GameObject {
 
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, game);
-    this.position.x = x;
+    this.position.x = 0;
     this.position.y = y;
     this._pointerPosition = {
-      x: 0,
-      y: 0,
+      x: x,
+      y: y,
     };
     this._positionYPercent = y / game.canvas.height;
     this._frameX = 1;
@@ -49,6 +51,7 @@ class Player extends GameObject {
       new Fly(this.game),
     ];
     this._currentState = this._states[0];
+    this._particles = [];
     this._image = new Image();
     this._image.src = '/Astro.png';
     this._image.onload = () => {
@@ -81,6 +84,9 @@ class Player extends GameObject {
   }
   get verticalForce() {
     return this._verticalForce;
+  }
+  get particles() {
+    return this._particles;
   }
 
   // SETTERS
@@ -139,6 +145,11 @@ class Player extends GameObject {
 
   update(timeStamp: number): void {
     this._dx = this.checkDirection();
+    this.particles.forEach((particle, index) => {
+      if (!particle.isActive) {
+        this.particles.splice(index, 1);
+      }
+    });
     this.movePlayer(timeStamp, this.game.canvas);
     this.currentState.handleStateChange(this.position, this.game.config);
   }

@@ -18,6 +18,7 @@ class GameObject {
   _height: number;
   _position: Position;
   _id;
+  _free: boolean;
   protected game;
 
   constructor(width: number, height: number, game: Game) {
@@ -26,6 +27,7 @@ class GameObject {
     this._id = uuidv4();
     this.game = game;
     this._position = { x: 0, y: 0 };
+    this._free = true;
   }
 
   // GETTERS
@@ -41,6 +43,9 @@ class GameObject {
   public get id() {
     return this._id;
   }
+  get free(): boolean {
+    return this._free;
+  }
 
   // SETTERS
   set width(int: number) {
@@ -48,6 +53,9 @@ class GameObject {
   }
   set height(int: number) {
     this._height = int;
+  }
+  set free(bool: boolean) {
+    this._free = bool;
   }
 
   init(): void {}
