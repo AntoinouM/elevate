@@ -7,10 +7,6 @@ import { Dust } from './Particule';
 import Planet from './Planet';
 import Player from './Player';
 
-interface Freeable {
-  free: boolean;
-}
-
 const states = {
   BEFORE: 0,
   ONGOING: 1,
@@ -43,7 +39,9 @@ class GameStates {
     this._state = state;
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   update(timeStamp: number): void {}
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   render(): void {}
 }
@@ -54,6 +52,10 @@ class GameBefore extends GameStates {
   }
 
   start() {}
+
+  handleStateChange() {
+    this.game.setState(states.ONGOING);
+  }
 }
 
 class GameOnGoing extends GameStates {
@@ -183,6 +185,7 @@ class GameOnGoing extends GameStates {
       }
     });
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     const handleObjectFromPool = (object: Planet | Explosion): void => {};
 
     const isObjectFromPool = (object: GameObject): boolean => {
@@ -193,6 +196,7 @@ class GameOnGoing extends GameStates {
       }
     };
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   objectAreColliding(object1: GameObject, object2: GameObject): boolean {
     const bbA = object1.getBoundingBox();

@@ -1,10 +1,6 @@
 import Player from './Player';
-import Planet from './Planet';
 import { GameObject } from './GameObject';
-import Explosion from './Explosion';
-import { Dust } from './Particule';
-import ParticlesContainer from './ParticlesContainer';
-import { CONFIG, poolFunctions, randomNumberBetween } from '../utils';
+import { CONFIG } from '../utils';
 import { GameBefore, GameEnded, GameOnGoing } from './GameStates';
 
 interface Freeable {
@@ -21,7 +17,6 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
-  #gameObjects = new Map<string, GameObject>();
 
   // state
   _states: GameBefore[] | GameOnGoing[] | GameEnded[];
