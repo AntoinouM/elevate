@@ -123,7 +123,7 @@ class Game {
 
     // debug mode
     if (!this.config.debug) return;
-    this.#gameObjects.forEach((object) => {
+    this.currentState.gameObjects.forEach((object) => {
       object.drawBoundingBox(this.context);
     });
   }

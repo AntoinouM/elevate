@@ -285,9 +285,9 @@ class Player extends GameObject {
 
   getBoundingBox(): BoundingBox {
     return {
-      x: this.position.x - this.width * 0.5 * 0.5,
+      x: this.position.x - this.width * 0.4 * 0.5,
       y: this.position.y - this.height * 0.9 * 0.5,
-      width: this.width * 0.5,
+      width: this.width * 0.4,
       height: this.height * 0.9,
     };
   }

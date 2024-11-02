@@ -20,6 +20,7 @@ const states = {
 class GameStates {
   _state: string;
   _game: Game;
+  #gameObjects = new Map<string, GameObject>();
 
   constructor(state: string, game: Game) {
     this._state = state;
@@ -32,6 +33,9 @@ class GameStates {
   }
   get game() {
     return this._game;
+  }
+  get gameObjects() {
+    return this.#gameObjects;
   }
 
   // SETTERS
@@ -57,7 +61,6 @@ class GameOnGoing extends GameStates {
   _explosionsPool: Explosion[];
   _particles: Dust[];
   _cloudContainer1: ParticlesContainer;
-  #gameObjects = new Map<string, GameObject>();
 
   constructor(game: Game) {
     super('ONGOING', game);
@@ -79,8 +82,8 @@ class GameOnGoing extends GameStates {
   get particles() {
     return this._particles;
   }
-  private get gameObjects() {
-    return this.#gameObjects;
+  get particleContainer() {
+    return this._cloudContainer1;
   }
 
   start() {}
@@ -94,6 +97,9 @@ class GameOnGoing extends GameStates {
   update(timeStamp: number) {
     // update game objects
     this.updateGameObjects(this.gameObjects, timeStamp);
+
+    // update particles container
+    this.particleContainer.update(timeStamp);
 
     // update particles
     this.game.player.particles.forEach((dust) => {
@@ -109,7 +115,7 @@ class GameOnGoing extends GameStates {
       );
       if (explosion) {
         explosion.activate(planet.position.x, planet.position.y);
-        this.#gameObjects.set(explosion.id, explosion);
+        this.gameObjects.set(explosion.id, explosion);
       }
       this.game.player.verticalForce = -this.game.config.impulseForce;
       planet.reset();
@@ -157,7 +163,7 @@ class GameOnGoing extends GameStates {
     );
     if (explosion) {
       explosion.activate(planet.position.x, planet.position.y);
-      this.#gameObjects.set(explosion.id, explosion);
+      this.gameObjects.set(explosion.id, explosion);
     }
   }
 
