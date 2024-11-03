@@ -88,6 +88,9 @@ class Player extends GameObject {
   get particles() {
     return this._particles;
   }
+  get positionYPercent() {
+    return this._positionYPercent;
+  }
 
   // SETTERS
   set pointerPosition(position: Position) {

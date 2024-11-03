@@ -75,7 +75,7 @@ const CONFIG = {
   PLANET: {
     diameter: 24,
     maximum: 12,
-    fallingSpeed: 0.08,
+    fallingSpeed: 0.05,
     planetTimer: 0,
     planetMinInterval: 2000,
     planetMaxInterval: 800,
