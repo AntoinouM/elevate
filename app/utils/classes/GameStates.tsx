@@ -63,6 +63,7 @@ class GameOnGoing extends GameStates {
   _explosionsPool: Explosion[];
   _particles: Dust[];
   _cloudContainer1: ParticlesContainer;
+  _planetCounter: number;
 
   constructor(game: Game) {
     super('ONGOING', game);
@@ -71,10 +72,15 @@ class GameOnGoing extends GameStates {
     this._explosionsPool = [];
     this._particles = [];
     this._cloudContainer1 = this.createCloud();
+    this._planetCounter = randomNumberBetween(
+      this.game.config.PLANET.planetMinInterval,
+      this.game.config.PLANET.planetMaxInterval
+    );
 
     this.init();
   }
 
+  // GETTERS
   get collectiblesPool() {
     return this._collectiblesPool;
   }
@@ -86,6 +92,14 @@ class GameOnGoing extends GameStates {
   }
   get particleContainer() {
     return this._cloudContainer1;
+  }
+  get planetCounter() {
+    return this._planetCounter;
+  }
+
+  // SETTERS
+  set planetCounter(int: number) {
+    this._planetCounter = int;
   }
 
   start() {}
@@ -124,7 +138,17 @@ class GameOnGoing extends GameStates {
     });
 
     // create periodically planets
-    this.createPlanetObjects(timeStamp);
+    this.planetCounter -= timeStamp;
+    if (this.planetCounter <= 0) {
+      this.planetCounter = randomNumberBetween(
+        this.game.config.PLANET.planetMinInterval,
+        this.game.config.PLANET.planetMaxInterval
+      );
+      this.spawnPlanetObjects();
+    }
+
+    // randomized x with player position
+    // use this,planetcounter to spawn planet and reset it to random
   }
 
   render() {
@@ -213,19 +237,11 @@ class GameOnGoing extends GameStates {
     } else return false;
   }
 
-  createPlanetObjects(timeStamp: number) {
-    if (
-      this.game.config.PLANET.planetTimer >
-      this.game.config.PLANET.planetMaxInterval
-    ) {
-      const planet = poolFunctions.getFirstFreeElementFromPool<Planet>(
-        this.collectiblesPool
-      );
-      planet?.activate();
-      this.game.config.PLANET.planetTimer = 0;
-    } else {
-      this.game.config.PLANET.planetTimer += timeStamp;
-    }
+  spawnPlanetObjects() {
+    const planet = poolFunctions.getFirstFreeElementFromPool<Planet>(
+      this.collectiblesPool
+    );
+    planet?.activate();
   }
 
   createCloud() {
