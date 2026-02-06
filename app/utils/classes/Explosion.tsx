@@ -87,7 +87,6 @@ class Explosion extends GameObject {
     this._timer = 0;
     this.free = false;
 
-    // Create smaller burst of particles (fewer for more compact effect)
     const particleCount = Math.floor(Math.random() * 6) + 8; // 8-14 particles
     this._particles = [];
 

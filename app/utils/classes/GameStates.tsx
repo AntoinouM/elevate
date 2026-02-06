@@ -6,6 +6,7 @@ import ParticlesContainer from './ParticlesContainer';
 import { Dust } from './Particule';
 import Planet from './Planet';
 import Player from './Player';
+import { GameState } from '../../models/game.model';
 
 const states = {
   BEFORE: 0,
@@ -14,11 +15,11 @@ const states = {
 };
 
 class GameStates {
-  _state: string;
+  _state: GameState;
   _game: Game;
   #gameObjects = new Map<string, GameObject>();
 
-  constructor(state: string, game: Game) {
+  constructor(state: GameState, game: Game) {
     this._state = state;
     this._game = game;
   }
@@ -35,7 +36,7 @@ class GameStates {
   }
 
   // SETTERS
-  set state(state: string) {
+  set state(state: GameState) {
     this._state = state;
   }
 
@@ -48,7 +49,7 @@ class GameStates {
 
 class GameBefore extends GameStates {
   constructor(game: Game) {
-    super('BEFORE', game);
+    super(GameState.BEFORE, game);
   }
 
   start() {}
@@ -66,7 +67,7 @@ class GameOnGoing extends GameStates {
   _planetCounter: number;
 
   constructor(game: Game) {
-    super('ONGOING', game);
+    super(GameState.ONGOING, game);
 
     this._collectiblesPool = [];
     this._explosionsPool = [];
@@ -342,7 +343,7 @@ class GameOnGoing extends GameStates {
 
 class GameEnded extends GameStates {
   constructor(game: Game) {
-    super('ENDED', game);
+    super(GameState.OVER, game);
   }
 
   start() {}

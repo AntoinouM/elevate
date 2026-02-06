@@ -1,6 +1,7 @@
 import Game from './Game';
 import { GameConfig } from '../utils';
 import { Dust } from './Particule';
+import { PlayerState } from '../../models/player.model';
 
 const states = {
   IDLE: 0,
@@ -15,10 +16,10 @@ interface Position {
 }
 
 class State {
-  _state: string;
+  _state: PlayerState;
   _game: Game;
 
-  constructor(state: string, game: Game) {
+  constructor(state: PlayerState, game: Game) {
     this._state = state;
     this._game = game;
   }
@@ -32,14 +33,14 @@ class State {
   }
 
   // SETTER
-  set state(state: string) {
+  set state(state: PlayerState) {
     this._state = state;
   }
 }
 
 class Idle extends State {
   constructor(game: Game) {
-    super('IDLE', game);
+    super(PlayerState.IDLE, game);
   }
 
   enter() {
@@ -58,7 +59,7 @@ class Idle extends State {
 
 class Walk extends State {
   constructor(game: Game) {
-    super('WALK', game);
+    super(PlayerState.WALK, game);
   }
 
   enter() {
@@ -77,7 +78,7 @@ class Walk extends State {
 
 class Rise extends State {
   constructor(game: Game) {
-    super('RISE', game);
+    super(PlayerState.RISE, game);
   }
 
   enter() {
@@ -92,8 +93,8 @@ class Rise extends State {
         this.game,
         this.game.player.position.x,
         this.game.player.position.y,
-        'rgba(255,255,255,0.5)'
-      )
+        'rgba(255,255,255,0.5)',
+      ),
     );
     if (this.game.player.verticalForce >= 0)
       this.game.player.setState(states.FLY);
@@ -103,7 +104,7 @@ class Rise extends State {
 
 class Fly extends State {
   constructor(game: Game) {
-    super('FLY', game);
+    super(PlayerState.FLY, game);
   }
 
   enter() {
@@ -112,16 +113,22 @@ class Fly extends State {
     this.game.player._imageOptions.fps = 8;
   }
   handleStateChange(position: Position, config: GameConfig) {
-    if (position.y < config.ground) {
-      if (this.game.player.verticalForce < 0)
-        this.game.player.setState(states.RISE);
-    } else if (position.y === config.ground) {
+    // Add a small threshold to prevent flickering at apex of jump
+    const isRising = this.game.player.verticalForce < -0.01;
+    const isFalling = this.game.player.verticalForce > 0.01;
+
+    // Only transition to ground states if definitely on ground AND falling/stable
+    if (position.y === config.ground && !isRising) {
       if (this.game.player.pointerDistance > 2) {
         this.game.player.setState(states.WALK);
       } else {
         this.game.player.setState(states.IDLE);
       }
+    } else if (position.y < config.ground && isRising) {
+      // Only switch to RISE if definitely going up
+      this.game.player.setState(states.RISE);
     }
+    // If at apex (verticalForce near 0), stay in FLY state
   }
 }
 
