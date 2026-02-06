@@ -29,7 +29,7 @@ class Game {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
     backgroundCanvas: HTMLCanvasElement,
-    backgroundContext: CanvasRenderingContext2D
+    backgroundContext: CanvasRenderingContext2D,
   ) {
     this._canvas = canvas;
     this._context = context;
@@ -183,7 +183,7 @@ class Game {
       this.config.HERO.height,
       this._canvasWidth * 0.5,
       this.config.ground,
-      this
+      this,
     );
   }
 

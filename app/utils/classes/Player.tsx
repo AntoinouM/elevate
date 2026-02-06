@@ -114,7 +114,7 @@ class Player extends GameObject {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void {
     // later on add more parameters to make the draw function reusable;
     if (!this._imageLoaded) return;
@@ -124,10 +124,10 @@ class Player extends GameObject {
   init(): void {
     // trigger mouse detection
     window.addEventListener('mousemove', (event) =>
-      this.handlePointer(event, this.game.context.canvas)
+      this.handlePointer(event, this.game.context.canvas),
     );
     this.game.canvas.addEventListener('touchmove', (event) =>
-      this.handlePointer(event, this.game.context.canvas)
+      this.handlePointer(event, this.game.context.canvas),
     );
     this.game.canvas.addEventListener('touchstart', () => {
       if (this.position.y === this.game.config.ground) {
@@ -144,7 +144,7 @@ class Player extends GameObject {
   update(timeStamp: number): void {
     this._dx = this.checkDirection();
     // Filter out inactive particles efficiently
-    this._particles = this._particles.filter(particle => particle.isActive);
+    this._particles = this._particles.filter((particle) => particle.isActive);
     this.movePlayer(timeStamp, this.game.canvas);
     this.currentState.handleStateChange(this.position, this.game.config);
   }
@@ -159,7 +159,7 @@ class Player extends GameObject {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.frameX = Math.floor(
       ((performance.now() / 1000) * this._imageOptions.fps) %
-        this._imageOptions.maxFrame
+        this._imageOptions.maxFrame,
     );
 
     this._positionYPercent =
@@ -176,7 +176,7 @@ class Player extends GameObject {
       -this.width * 0.5,
       -this.height * 0.5,
       this.width,
-      this.height
+      this.height,
     );
 
     this.game.context.restore();
@@ -184,7 +184,7 @@ class Player extends GameObject {
 
   handlePointer = (
     event: MouseEvent | TouchEvent,
-    canvas: HTMLCanvasElement
+    canvas: HTMLCanvasElement,
   ): void => {
     if (event.type.includes('touch')) {
       const touchEvent = event as TouchEvent;
@@ -204,7 +204,7 @@ class Player extends GameObject {
   updateXPosition(
     sourcePosition: number,
     targetPosition: number,
-    maxDistance: number
+    maxDistance: number,
   ): number {
     let sourceToTargetDistance = 0;
 
@@ -233,8 +233,7 @@ class Player extends GameObject {
       this.height * 0.5
     ) {
       gravityDelta =
-        1 +
-        this.game.canvasHeight / (this.position.y! + this.height) / 10;
+        1 + this.game.canvasHeight / (this.position.y! + this.height) / 10;
     } else {
       gravityDelta = 1;
     }
@@ -252,7 +251,7 @@ class Player extends GameObject {
     this._pointerDistance = this.updateXPosition(
       this.position.x!,
       this.pointerPosition.x,
-      this._pointerMaxDistance
+      this._pointerMaxDistance,
     );
 
     // movement implementation

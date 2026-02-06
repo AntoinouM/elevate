@@ -77,7 +77,7 @@ class Explosion extends GameObject {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void {
     context.drawImage(image, sx, sy, sWidth, sHeight, x, y, width, height);
   }
@@ -103,7 +103,7 @@ class Explosion extends GameObject {
       -dimensionBuffed(this.width) * 0.5,
       -dimensionBuffed(this.height) * 0.5,
       dimensionBuffed(this.width),
-      dimensionBuffed(this.height)
+      dimensionBuffed(this.height),
     );
 
     this.game.context.restore();

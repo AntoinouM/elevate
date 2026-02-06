@@ -30,7 +30,7 @@ class Planet extends GameObject {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void {
     context.beginPath();
     context.arc(x, y, width, 0, Math.PI * 2);
@@ -42,7 +42,7 @@ class Planet extends GameObject {
     this.position.x = Math.random() * this.game.canvasWidth;
     this.position.x = randomNumberBetween(
       this.width * 0.5,
-      this.game.canvasWidth - this.width * 0.5
+      this.game.canvasWidth - this.width * 0.5,
     );
     this.position.y = -this.width;
 
@@ -58,7 +58,7 @@ class Planet extends GameObject {
 
     // change falling speed of planet regarding player position
     this.fallAccelerator = this.getSpeedCoefficient(
-      this.game.player.positionYPercent
+      this.game.player.positionYPercent,
     );
 
     if (this.position.y! > this.game.canvasHeight + this.width * 0.5)
@@ -77,7 +77,7 @@ class Planet extends GameObject {
       this.position.x!,
       this.position.y!,
       this.width * 0.5,
-      this.height
+      this.height,
     );
   }
 
