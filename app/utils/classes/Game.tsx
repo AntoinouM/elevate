@@ -172,6 +172,7 @@ class Game {
       const elapsed = currentTime - this.lastTickTimestamp;
 
       // Only proceed if enough time has passed to match target FPS
+      // This ensures consistent gameplay speed across all refresh rates
       if (elapsed >= this.config.fpsInterval) {
         // Update and render the game
         this.update(elapsed);

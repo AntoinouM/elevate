@@ -42,13 +42,13 @@ const poolFunctions = {
   executeOnPool<T, P>(
     pool: Array<T>,
     callback: (pool: Array<T>, params: P) => void,
-    params: P
+    params: P,
   ): void {
     callback(pool, params);
   },
 
   getFirstFreeElementFromPool<T extends { free: boolean }>(
-    pool: Array<T>
+    pool: Array<T>,
   ): T | undefined {
     for (let i: number = 0; i < pool.length; i++) {
       if (pool[i].free) return pool[i];
@@ -59,10 +59,10 @@ const poolFunctions = {
 // Utility function for generating a random number
 const randomNumberBetween = (
   minRandomNumber: number,
-  maxRandomNumber: number
+  maxRandomNumber: number,
 ): number => {
   return Math.floor(
-    Math.random() * (maxRandomNumber - minRandomNumber + 1) + minRandomNumber
+    Math.random() * (maxRandomNumber - minRandomNumber + 1) + minRandomNumber,
   );
 };
 
