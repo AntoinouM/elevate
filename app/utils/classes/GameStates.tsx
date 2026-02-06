@@ -254,7 +254,7 @@ class GameOnGoing extends GameStates {
 
     // Reduce reachable distance by 20% to trigger safety spawning earlier (easier)
     const reducedJumpHeight = maxJumpHeight * 0.8;
-    
+
     // Add margin for safety
     const reachableMinY = this.game.player.position.y - reducedJumpHeight - 100;
     const reachableMaxY = this.game.player.position.y + 200; // Include falling distance

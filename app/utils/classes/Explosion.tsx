@@ -1,53 +1,35 @@
 import Game from './Game';
 import { GameObject } from './GameObject';
-import ImageCache from '../ImageCache';
+import { ExplosionParticle } from './Particule';
 
 class Explosion extends GameObject {
-  _config;
   _width: number;
   _height: number;
-  _image: HTMLImageElement;
-  _frameX: number;
+  _particles: ExplosionParticle[];
   _timer: number;
   _free: boolean;
-  #angle: number;
-  #imageReady: boolean = false;
+  _maxLifetime: number = 600; // Maximum lifetime in ms
 
   constructor(width: number, height: number, game: Game) {
     super(width, height, game);
     this._width = width;
     this._height = height;
-    this._config = {
-      spriteWidth: 200,
-      spriteHeight: 179,
-      frames: 5,
-      speed: 5,
-    };
-    this._image = ImageCache.getInstance().getImage('/boom.png');
-    this.#imageReady = true; // Images are preloaded, so immediately mark as ready
-    this._frameX = 0;
+    this._particles = [];
     this._timer = 0;
     this._free = true;
-    this.#angle = Math.random() * 6.2;
 
     this.init();
   }
 
   // GETTERS
-  get config() {
-    return this._config;
-  }
   get width() {
     return this._width;
   }
   get height() {
     return this._height;
   }
-  get image() {
-    return this._image;
-  }
-  get frameX() {
-    return this._frameX;
+  get particles() {
+    return this._particles;
   }
   get timer() {
     return this._timer;
@@ -57,9 +39,6 @@ class Explosion extends GameObject {
   }
 
   // SETTERS
-  set frameX(int: number) {
-    this._frameX = int;
-  }
   set timer(int: number) {
     this._timer = int;
   }
@@ -67,67 +46,54 @@ class Explosion extends GameObject {
     this._free = bool;
   }
 
-  draw(
-    context: CanvasRenderingContext2D,
-    image: CanvasImageSource,
-    sx: number,
-    sy: number,
-    sWidth: number,
-    sHeight: number,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  ): void {
-    context.drawImage(image, sx, sy, sWidth, sHeight, x, y, width, height);
-  }
-
   render() {
-    const sizeBuffer = 1.5;
-    const dimensionBuffed = (dim: number) => {
-      return dim * sizeBuffer;
-    };
-
-    this.game.context.save();
-
-    this.game.context.translate(this.position.x, this.position.y);
-    this.game.context.rotate(this.#angle);
-
-    this.draw(
-      this.game.context,
-      this.image,
-      this.config.spriteWidth * this.frameX,
-      0,
-      this.config.spriteWidth,
-      this.config.spriteHeight,
-      -dimensionBuffed(this.width) * 0.5,
-      -dimensionBuffed(this.height) * 0.5,
-      dimensionBuffed(this.width),
-      dimensionBuffed(this.height),
-    );
-
-    this.game.context.restore();
+    if (this.free) return;
+    
+    // Draw all particles
+    this._particles.forEach((particle) => {
+      particle.draw(this.game.context);
+    });
   }
 
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   update(timeStamp: number) {
-    this.timer++;
-    if (this.timer % this.config.speed === 0) {
-      this.frameX++;
+    if (this.free) return;
+    
+    // Update timer
+    this._timer += timeStamp;
+    
+    // Update all particles
+    this._particles.forEach((particle) => {
+      particle.update(timeStamp);
+    });
+    
+    // Remove inactive particles
+    this._particles = this._particles.filter((particle) => particle.isActive);
+    
+    // Reset explosion when all particles are gone or max lifetime reached
+    if (this._particles.length === 0 || this._timer >= this._maxLifetime) {
+      this.reset();
     }
-    if (this.frameX > this.config.frames) this.reset();
   }
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   reset() {
     this.free = true;
+    this._particles = [];
+    this._timer = 0;
   }
 
   activate(x: number, y: number) {
     this.position.x = x;
     this.position.y = y;
-    this.frameX = 0;
+    this._timer = 0;
     this.free = false;
+    
+    // Create smaller burst of particles (fewer for more compact effect)
+    const particleCount = Math.floor(Math.random() * 6) + 8; // 8-14 particles
+    this._particles = [];
+    
+    for (let i = 0; i < particleCount; i++) {
+      this._particles.push(new ExplosionParticle(this.game, x, y));
+    }
   }
 }
 
