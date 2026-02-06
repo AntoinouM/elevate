@@ -1,6 +1,7 @@
 import Player from './Player';
 import { CONFIG } from '../utils';
 import { GameBefore, GameEnded, GameOnGoing } from './GameStates';
+import ImageCache from '../ImageCache';
 
 interface Freeable {
   free: boolean;
@@ -16,6 +17,9 @@ class Game {
   _lastRenderTime: number;
   _player: Player;
   _keys: Set<string>;
+  _canvasWidth: number = 0;
+  _canvasHeight: number = 0;
+  _assetsLoaded: boolean = false;
 
   // state
   _states: GameBefore[] | GameOnGoing[] | GameEnded[];
@@ -33,9 +37,11 @@ class Game {
     this._backgroundContext = backgroundContext;
     this._keys = new Set();
     this._config = CONFIG;
-    this._config.ground = this.canvas.clientHeight - 100 / 1.5;
+    this._canvasWidth = canvas.clientWidth;
+    this._canvasHeight = canvas.clientHeight;
+    this._config.ground = this._canvasHeight - 100 / 1.5;
     this.config.HERO.height = this.config.HERO.width =
-      this.canvas.clientHeight * 0.12;
+      this._canvasHeight * 0.12;
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
     this._player = this.createPlayer();
 
@@ -47,14 +53,21 @@ class Game {
     ];
     this._currentState = this._states[1];
 
-    this.init();
-
     window.addEventListener('keydown', (e) => {
       this.keys.add(e.key);
     });
     window.addEventListener('keyup', () => {
       this.keys.clear();
     });
+    window.addEventListener('resize', () => {
+      this._canvasWidth = this.canvas.clientWidth;
+      this._canvasHeight = this.canvas.clientHeight;
+      this._config.ground = this._canvasHeight - 100 / 1.5;
+      this.config.HERO.height = this.config.HERO.width =
+        this._canvasHeight * 0.12;
+    });
+
+    this.preloadAssets();
   }
 
   // GETTERS
@@ -88,6 +101,12 @@ class Game {
   get currentState() {
     return this._currentState;
   }
+  get canvasWidth() {
+    return this._canvasWidth;
+  }
+  get canvasHeight() {
+    return this._canvasHeight;
+  }
 
   // SETTERS
   set lastTickTimestamp(time: number) {
@@ -100,8 +119,19 @@ class Game {
     this._currentState = state;
   }
 
-  init(): void {
-    this.start();
+  preloadAssets(): void {
+    const imageCache = ImageCache.getInstance();
+    const imagePaths = ['/Astro.png', '/boom.png'];
+
+    imageCache
+      .preloadImages(imagePaths)
+      .then(() => {
+        this._assetsLoaded = true;
+        this.start();
+      })
+      .catch((error) => {
+        console.error('Asset loading failed:', error);
+      });
   }
 
   update(timeStamp: number): void {
@@ -124,22 +154,18 @@ class Game {
 
   start(): void {
     this.lastTickTimestamp = performance.now();
-    let previousTime = performance.now();
 
     const gameLoop = (currentTime: number): void => {
       // Calculate time passed since last frame
-      const elapsed = currentTime - previousTime;
+      const elapsed = currentTime - this.lastTickTimestamp;
 
       // Only proceed if enough time has passed to match target FPS
       if (elapsed >= this.config.fpsInterval) {
-        const timePassedSinceLastRender = currentTime - this.lastTickTimestamp;
-
         // Update and render the game
-        this.update(timePassedSinceLastRender);
+        this.update(elapsed);
         this.render();
 
         // Record the last time we rendered
-        previousTime = currentTime - (elapsed % this.config.fpsInterval);
         this.lastTickTimestamp = currentTime;
       }
 
@@ -155,7 +181,7 @@ class Game {
     return new Player(
       this.config.HERO.width,
       this.config.HERO.height,
-      this.canvas.clientWidth * 0.5,
+      this._canvasWidth * 0.5,
       this.config.ground,
       this
     );
@@ -164,7 +190,7 @@ class Game {
   clearCanvases(canvases: HTMLCanvasElement[]) {
     canvases.forEach((canvas) => {
       const context = canvas.getContext('2d');
-      context!.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      context!.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
     });
   }
 

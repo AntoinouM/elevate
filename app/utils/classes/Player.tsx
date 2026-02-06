@@ -2,6 +2,7 @@ import Game from './Game';
 import { BoundingBox, GameObject } from './GameObject';
 import { Fly, Idle, Rise, Walk } from './State';
 import { Dust } from './Particule';
+import ImageCache from '../ImageCache';
 
 interface Position {
   x: number;
@@ -52,14 +53,8 @@ class Player extends GameObject {
     ];
     this._currentState = this._states[0];
     this._particles = [];
-    this._image = new Image();
-    this._image.src = '/Astro.png';
-    this._image.onload = () => {
-      this._imageLoaded = true; // Mark as loaded once the image is fully loaded
-    };
-    this._image.onerror = () => {
-      console.error('Failed to load the player image.');
-    };
+    this._image = ImageCache.getInstance().getImage('/Astro.png');
+    this._imageLoaded = true; // Images are preloaded, so immediately mark as loaded
     this.init();
   }
 
@@ -148,11 +143,8 @@ class Player extends GameObject {
 
   update(timeStamp: number): void {
     this._dx = this.checkDirection();
-    this.particles.forEach((particle, index) => {
-      if (!particle.isActive) {
-        this.particles.splice(index, 1);
-      }
-    });
+    // Filter out inactive particles efficiently
+    this._particles = this._particles.filter(particle => particle.isActive);
     this.movePlayer(timeStamp, this.game.canvas);
     this.currentState.handleStateChange(this.position, this.game.config);
   }
@@ -171,7 +163,7 @@ class Player extends GameObject {
     );
 
     this._positionYPercent =
-      100 - (this.getBoundingBox().y / this.game.canvas.clientHeight) * 100;
+      100 - (this.getBoundingBox().y / this.game.canvasHeight) * 100;
 
     // draw player
     this.draw(
@@ -237,12 +229,12 @@ class Player extends GameObject {
     // create a variable to influence the falling speed if too close to the top
     let gravityDelta = 1;
     if (
-      ((this.position.y! + this.height) * 100) / this.game.canvas.clientHeight <
+      ((this.position.y! + this.height) * 100) / this.game.canvasHeight <
       this.height * 0.5
     ) {
       gravityDelta =
         1 +
-        this.game.canvas.clientHeight / (this.position.y! + this.height) / 10;
+        this.game.canvasHeight / (this.position.y! + this.height) / 10;
     } else {
       gravityDelta = 1;
     }
@@ -278,8 +270,8 @@ class Player extends GameObject {
     // verticalForce input if contact with clouds
     // boundaries checking
     // check for right boundary
-    if (this.position.x! > canvas.offsetWidth)
-      this.position.x = canvas.offsetWidth;
+    if (this.position.x! > this.game.canvasWidth)
+      this.position.x = this.game.canvasWidth;
     // check for left boundary
     if (this.position.x! < 0) this.position.x = 0;
     // check for top boundary

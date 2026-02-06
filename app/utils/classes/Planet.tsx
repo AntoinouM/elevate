@@ -39,10 +39,10 @@ class Planet extends GameObject {
   /* eslint-enable @typescript-eslint/no-unused-vars */
 
   init(): void {
-    this.position.x = Math.random() * this.game.canvas.clientWidth;
+    this.position.x = Math.random() * this.game.canvasWidth;
     this.position.x = randomNumberBetween(
       this.width * 0.5,
-      this.game.canvas.clientWidth - this.width * 0.5
+      this.game.canvasWidth - this.width * 0.5
     );
     this.position.y = -this.width;
 
@@ -61,7 +61,7 @@ class Planet extends GameObject {
       this.game.player.positionYPercent
     );
 
-    if (this.position.y! > this.game.canvas.clientHeight + this.width * 0.5)
+    if (this.position.y! > this.game.canvasHeight + this.width * 0.5)
       this.reset();
   }
 
@@ -99,7 +99,7 @@ class Planet extends GameObject {
 
   reset() {
     this.free = true;
-    this.position.x = Math.random() * this.game.canvas.clientWidth;
+    this.position.x = Math.random() * this.game.canvasWidth;
     this.position.y = 0;
   }
 

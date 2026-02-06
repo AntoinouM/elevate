@@ -14,7 +14,7 @@ const ScaledCanvas: React.FC = () => {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
     width: number,
-    height: number
+    height: number,
   ): void => {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr; // Set the actual pixel width
@@ -28,11 +28,11 @@ const ScaledCanvas: React.FC = () => {
     const canvas = canvasRef.current;
     const canvasBg = canvasBackground.current;
 
-    if (!canvas || !canvasBg) return; // TypeScript safety check
+    if (!canvas || !canvasBg) return;
 
     const context = canvas.getContext('2d');
     const contextBg = canvasBg.getContext('2d');
-    if (!context || !contextBg) return; // TypeScript safety check
+    if (!context || !contextBg) return;
 
     const updateDimension = (): void => {
       widthRef.current = canvas.clientWidth;

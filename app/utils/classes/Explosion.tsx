@@ -1,5 +1,6 @@
 import Game from './Game';
 import { GameObject } from './GameObject';
+import ImageCache from '../ImageCache';
 
 class Explosion extends GameObject {
   _config;
@@ -22,11 +23,8 @@ class Explosion extends GameObject {
       frames: 5,
       speed: 5,
     };
-    this._image = new Image();
-    this._image.onload = () => {
-      this.#imageReady = true;
-    };
-    this._image.src = '/boom.png';
+    this._image = ImageCache.getInstance().getImage('/boom.png');
+    this.#imageReady = true; // Images are preloaded, so immediately mark as ready
     this._frameX = 0;
     this._timer = 0;
     this._free = true;
