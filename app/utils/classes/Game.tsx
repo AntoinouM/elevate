@@ -153,7 +153,9 @@ class Game {
   }
 
   render(): void {
-    this.clearCanvases([this.canvas, this.backgroundCanvas]);
+    // Clear both canvases using stored contexts
+    this._context.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
+    this._backgroundContext.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
 
     this.currentState.render();
 
@@ -198,13 +200,6 @@ class Game {
       this.config.ground,
       this,
     );
-  }
-
-  clearCanvases(canvases: HTMLCanvasElement[]) {
-    canvases.forEach((canvas) => {
-      const context = canvas.getContext('2d');
-      context!.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
-    });
   }
 
   setDebugMode() {
