@@ -120,6 +120,11 @@ class ContainedParticle extends Particle {
   _container: ParticlesContainer;
   _directionX: number;
   _directionY: number;
+  _targetX: number; // Original relative position in container
+  _targetY: number; // Original relative position in container
+  _baseSpeedX: number; // Store original speed
+  _baseSpeedY: number; // Store original speed
+  _timeSinceCollision: number; // Track time since player collision
 
   constructor(
     game: Game,
@@ -135,8 +140,13 @@ class ContainedParticle extends Particle {
     this.width = this.height = this.size * 2;
     this.speedX = Math.random();
     this.speedY = Math.random();
+    this._baseSpeedX = this.speedX; // Store original speed
+    this._baseSpeedY = this.speedY; // Store original speed
     this.color = color;
     this._container = container;
+    this._targetX = x; // Store original relative position
+    this._targetY = y; // Store original relative position
+    this._timeSinceCollision = 1000; // Start with high value (not recently collided)
 
     // Randomization of direction
     this._directionX = Math.random() < 0.5 ? -1 : 1;
@@ -153,14 +163,29 @@ class ContainedParticle extends Particle {
       deltaY = 0;
     }
 
-    // Check boundaries and ensure particles stay within the container
-    this.clampInContainer(this._container);
+    // Increment time since last collision
+    this._timeSinceCollision += timeStamp;
+
+    // Gradually reduce boosted speed back to base speed (slower decay)
+    if (this._timeSinceCollision > 300) {
+      const speedDecay = 0.997; // Even more gradual slowdown
+      this.speedX = Math.max(this._baseSpeedX, this.speedX * speedDecay);
+      this.speedY = Math.max(this._baseSpeedY, this.speedY * speedDecay);
+    }
 
     // change direction of particle and speed if collision with player
     this.manageCollisionWithPlayer(this.game.player);
 
-    // check if particle is in container
-    if (this.isInContainer(this._container)) {
+    // Only clamp boundaries if not recently hit by player (allow escape)
+    if (this._timeSinceCollision > 200) {
+      this.clampInContainer(this._container);
+    }
+
+    // Reform cloud: gradually move particles back toward their target positions
+    // Increased delay to 1200ms for more visible dispersion
+    if (this._timeSinceCollision > 1200) {
+      this.reformToTarget(timeStamp, deltaX, deltaY);
+    } else if (this.isInContainer(this._container)) {
       // Move particles based on their speed and direction
       this.moveParticle(
         timeStamp,
@@ -210,12 +235,28 @@ class ContainedParticle extends Particle {
       this.position.y >= player.y &&
       this.position.y <= player.y + player.height
     ) {
-      // check which border is closer
-      const isCloserToRightSide =
-        this.position.x - player.x > player.x + player.width - this.position.x;
-      // change direction to closer side
-      if (isCloserToRightSide) this.position.x = player.x + player.width;
-      if (!isCloserToRightSide) this.position.x = player.x;
+      // Reset collision timer
+      this._timeSinceCollision = 0;
+
+      // Calculate center of player
+      const playerCenterX = player.x + player.width / 2;
+      const playerCenterY = player.y + player.height / 2;
+
+      // Calculate vector from player center to particle
+      const dx = this.position.x - playerCenterX;
+      const dy = this.position.y - playerCenterY;
+
+      // Normalize and add repulsion force (push away from player)
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > 0) {
+        const repulsionStrength = 6; // Increased from 3 for more dramatic effect
+        this.position.x += (dx / distance) * repulsionStrength;
+        this.position.y += (dy / distance) * repulsionStrength;
+
+        // Increase speed temporarily for scattering effect
+        this.speedX = Math.min(this.speedX * 2.0, 0.15); // Stronger boost for more visible scatter
+        this.speedY = Math.min(this.speedY * 2.0, 0.15);
+      }
     }
   }
 
@@ -274,6 +315,29 @@ class ContainedParticle extends Particle {
       normalizedX * this.speedX * timeStamp * smoothingFactor + deltaX;
     this.position.y +=
       normalizedY * this.speedY * timeStamp * smoothingFactor + deltaY;
+  }
+
+  reformToTarget(timeStamp: number, deltaX: number, deltaY: number) {
+    // Calculate target position relative to container
+    const targetX = this._container.getBoundingBox().x + this._targetX;
+    const targetY = this._container.getBoundingBox().y + this._targetY;
+
+    // Calculate vector to target position
+    const dx = targetX - this.position.x;
+    const dy = targetY - this.position.y;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Gradually move toward target position
+    if (distance > 1) {
+      const reformSpeed = 0.008; // Even slower reformation for more visible effect
+      this.position.x += (dx / distance) * reformSpeed * timeStamp;
+      this.position.y += (dy / distance) * reformSpeed * timeStamp;
+    }
+
+    // Add container delta to move with container
+    this.position.x += deltaX;
+    this.position.y += deltaY;
   }
 }
 

@@ -155,7 +155,12 @@ class Game {
   render(): void {
     // Clear both canvases using stored contexts
     this._context.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
-    this._backgroundContext.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
+    this._backgroundContext.clearRect(
+      0,
+      0,
+      this._canvasWidth,
+      this._canvasHeight,
+    );
 
     this.currentState.render();
 
