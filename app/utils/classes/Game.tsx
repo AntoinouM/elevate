@@ -21,6 +21,11 @@ class Game {
   _canvasHeight: number = 0;
   _assetsLoaded: boolean = false;
 
+  // Event handler references for cleanup
+  private _handleKeyDown: (e: KeyboardEvent) => void;
+  private _handleKeyUp: () => void;
+  private _handleResize: () => void;
+
   // state
   _states: GameBefore[] | GameOnGoing[] | GameEnded[];
   _currentState: GameBefore | GameOnGoing | GameEnded;
@@ -43,6 +48,22 @@ class Game {
     this.config.HERO.height = this.config.HERO.width =
       this._canvasHeight * 0.12;
     this._lastRenderTime = performance.now(); // Initialize the last render timestamp
+
+    // Bind event handlers for proper cleanup
+    this._handleKeyDown = (e: KeyboardEvent) => {
+      this.keys.add(e.key);
+    };
+    this._handleKeyUp = () => {
+      this.keys.clear();
+    };
+    this._handleResize = () => {
+      this._canvasWidth = this.canvas.clientWidth;
+      this._canvasHeight = this.canvas.clientHeight;
+      this._config.ground = this._canvasHeight - 100 / 1.5;
+      this.config.HERO.height = this.config.HERO.width =
+        this._canvasHeight * 0.12;
+    };
+
     this._player = this.createPlayer();
 
     // states
@@ -53,19 +74,10 @@ class Game {
     ];
     this._currentState = this._states[1];
 
-    window.addEventListener('keydown', (e) => {
-      this.keys.add(e.key);
-    });
-    window.addEventListener('keyup', () => {
-      this.keys.clear();
-    });
-    window.addEventListener('resize', () => {
-      this._canvasWidth = this.canvas.clientWidth;
-      this._canvasHeight = this.canvas.clientHeight;
-      this._config.ground = this._canvasHeight - 100 / 1.5;
-      this.config.HERO.height = this.config.HERO.width =
-        this._canvasHeight * 0.12;
-    });
+    // Add event listeners
+    window.addEventListener('keydown', this._handleKeyDown);
+    window.addEventListener('keyup', this._handleKeyUp);
+    window.addEventListener('resize', this._handleResize);
 
     this.preloadAssets();
   }
@@ -205,6 +217,16 @@ class Game {
   setState(int: number) {
     this.currentState = this.states[int];
     this.currentState.start();
+  }
+
+  destroy(): void {
+    // Remove event listeners
+    window.removeEventListener('keydown', this._handleKeyDown);
+    window.removeEventListener('keyup', this._handleKeyUp);
+    window.removeEventListener('resize', this._handleResize);
+
+    // Cleanup player
+    this.player.destroy();
   }
 }
 

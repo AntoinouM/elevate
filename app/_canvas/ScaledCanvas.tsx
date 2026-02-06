@@ -53,9 +53,10 @@ const ScaledCanvas: React.FC = () => {
     const game = new Game(canvas, context, canvasBg, contextBg);
     console.log(game);
 
-    // Clean up the event listener on unmount
+    // Clean up all event listeners on unmount
     return () => {
       window.removeEventListener('resize', updateDimension);
+      game.destroy(); // Clean up game and all its event listeners
     };
   }, []);
 

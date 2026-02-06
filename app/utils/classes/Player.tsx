@@ -34,6 +34,12 @@ class Player extends GameObject {
   _frameX: number;
   _frameY: number;
 
+  // Event handler references for cleanup
+  private _handleMouseMove!: (event: MouseEvent) => void;
+  private _handleTouchMove!: (event: TouchEvent) => void;
+  private _handleTouchStart!: () => void;
+  private _handleMouseDown!: () => void;
+
   constructor(width: number, height: number, x: number, y: number, game: Game) {
     super(width, height, game);
     this.position.x = 0;
@@ -122,23 +128,27 @@ class Player extends GameObject {
   }
 
   init(): void {
-    // trigger mouse detection
-    window.addEventListener('mousemove', (event) =>
-      this.handlePointer(event, this.game.context.canvas),
-    );
-    this.game.canvas.addEventListener('touchmove', (event) =>
-      this.handlePointer(event, this.game.context.canvas),
-    );
-    this.game.canvas.addEventListener('touchstart', () => {
+    // Bind event handlers for proper cleanup
+    this._handleMouseMove = (event: MouseEvent) =>
+      this.handlePointer(event, this.game.context.canvas);
+    this._handleTouchMove = (event: TouchEvent) =>
+      this.handlePointer(event, this.game.context.canvas);
+    this._handleTouchStart = () => {
       if (this.position.y === this.game.config.ground) {
         this.verticalForce -= this.game.config.impulseForce;
       }
-    });
-    this.game.canvas.addEventListener('mousedown', () => {
+    };
+    this._handleMouseDown = () => {
       if (this.position.y === this.game.config.ground) {
         this.verticalForce -= this.game.config.impulseForce;
       }
-    });
+    };
+
+    // Add event listeners
+    window.addEventListener('mousemove', this._handleMouseMove);
+    this.game.canvas.addEventListener('touchmove', this._handleTouchMove);
+    this.game.canvas.addEventListener('touchstart', this._handleTouchStart);
+    this.game.canvas.addEventListener('mousedown', this._handleMouseDown);
   }
 
   update(timeStamp: number): void {
@@ -295,6 +305,14 @@ class Player extends GameObject {
   setState(state: number) {
     this.currentState = this.states[state];
     this.currentState.enter();
+  }
+
+  destroy(): void {
+    // Remove event listeners
+    window.removeEventListener('mousemove', this._handleMouseMove);
+    this.game.canvas.removeEventListener('touchmove', this._handleTouchMove);
+    this.game.canvas.removeEventListener('touchstart', this._handleTouchStart);
+    this.game.canvas.removeEventListener('mousedown', this._handleMouseDown);
   }
 }
 
