@@ -101,7 +101,7 @@ class Dust extends Particle {
       this.position.y + this.game.player.height * 0.1,
       this.size,
       0,
-      Math.PI * 2
+      Math.PI * 2,
     );
     context.fillStyle = this.color;
     context.fill();
@@ -126,7 +126,7 @@ class ContainedParticle extends Particle {
     x: number,
     y: number,
     container: ParticlesContainer,
-    color: string
+    color: string,
   ) {
     super(game);
     this.position.x = container.getBoundingBox().x + x; // Start relative to container position
@@ -170,7 +170,7 @@ class ContainedParticle extends Particle {
         this._directionY,
         60,
         deltaX,
-        deltaY
+        deltaY,
       );
     } else {
       // bring to center
@@ -227,7 +227,7 @@ class ContainedParticle extends Particle {
     directionY: number,
     limiter: number,
     deltaX: number,
-    deltaY: number
+    deltaY: number,
   ) {
     this.position.x += (speedX * directionX * timeStamp) / limiter + deltaX;
     this.position.y += (speedY * directionY * timeStamp) / limiter + deltaY;
@@ -250,7 +250,7 @@ class ContainedParticle extends Particle {
     container: ParticlesContainer,
     timeStamp: number,
     deltaX: number,
-    deltaY: number
+    deltaY: number,
   ) {
     const centerX = container.position.x + container.width / 2;
     const centerY = container.position.y + container.height / 2;
@@ -261,7 +261,7 @@ class ContainedParticle extends Particle {
 
     // Calculate the Euclidean distance
     const distanceToCenter = Math.sqrt(
-      distanceX * distanceX + distanceY * distanceY
+      distanceX * distanceX + distanceY * distanceY,
     );
 
     // Normalize direction to center and scale by distance
@@ -288,49 +288,43 @@ class ExplosionParticle extends Particle {
     super(game);
     this.position.x = x;
     this.position.y = y;
-    
+
     // Smaller particle sizes
     this._initialSize = randomNumberBetween(4, 10);
     this.size = this._initialSize;
     this.width = this.height = this.size * 2;
-    
+
     // Even smaller explosion direction and speed for tighter area
     const angle = Math.random() * Math.PI * 2;
     const speed = randomNumberBetween(0.5, 1.5);
     this._directionX = Math.cos(angle) * speed;
     this._directionY = Math.sin(angle) * speed;
-    
+
     // Randomize colors for visual variety
     const colors = [
-      'rgba(255, 150, 50, 0.9)',   // Orange
-      'rgba(255, 100, 100, 0.9)',  // Red-orange
-      'rgba(255, 200, 50, 0.9)',   // Yellow-orange
-      'rgba(255, 80, 150, 0.9)',   // Pink
-      'rgba(200, 100, 255, 0.9)',  // Purple
+      'rgba(255, 150, 50, 0.9)', // Orange
+      'rgba(255, 100, 100, 0.9)', // Red-orange
+      'rgba(255, 200, 50, 0.9)', // Yellow-orange
+      'rgba(255, 80, 150, 0.9)', // Pink
+      'rgba(200, 100, 255, 0.9)', // Purple
     ];
     this.color = colors[Math.floor(Math.random() * colors.length)];
-    
+
     // Random lifespan for variety
     this._lifespan = randomNumberBetween(300, 600);
   }
 
   draw(context: CanvasRenderingContext2D) {
     if (!this.isActive) return;
-    
+
     // Fade out as particle ages
-    const fadePercent = 1 - (this._age / this._lifespan);
+    const fadePercent = 1 - this._age / this._lifespan;
     const alpha = Math.max(0, fadePercent);
-    
+
     context.save();
     context.globalAlpha = alpha;
     context.beginPath();
-    context.arc(
-      this.position.x,
-      this.position.y,
-      this.size,
-      0,
-      Math.PI * 2
-    );
+    context.arc(this.position.x, this.position.y, this.size, 0, Math.PI * 2);
     context.fillStyle = this.color;
     context.fill();
     context.restore();
@@ -338,17 +332,17 @@ class ExplosionParticle extends Particle {
 
   update(timeStamp: number) {
     if (!this.isActive) return;
-    
+
     // Update age
     this._age += timeStamp;
-    
+
     // Move outward from explosion center
     this.position.x += (this._directionX * timeStamp) / 16;
     this.position.y += (this._directionY * timeStamp) / 16;
-    
+
     // Shrink over time
     this.size *= 0.95;
-    
+
     // Deactivate when too small or too old
     if (this.size < 0.5 || this._age >= this._lifespan) {
       this.isActive = false;

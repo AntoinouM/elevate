@@ -48,7 +48,7 @@ class Explosion extends GameObject {
 
   render() {
     if (this.free) return;
-    
+
     // Draw all particles
     this._particles.forEach((particle) => {
       particle.draw(this.game.context);
@@ -57,18 +57,18 @@ class Explosion extends GameObject {
 
   update(timeStamp: number) {
     if (this.free) return;
-    
+
     // Update timer
     this._timer += timeStamp;
-    
+
     // Update all particles
     this._particles.forEach((particle) => {
       particle.update(timeStamp);
     });
-    
+
     // Remove inactive particles
     this._particles = this._particles.filter((particle) => particle.isActive);
-    
+
     // Reset explosion when all particles are gone or max lifetime reached
     if (this._particles.length === 0 || this._timer >= this._maxLifetime) {
       this.reset();
@@ -86,11 +86,11 @@ class Explosion extends GameObject {
     this.position.y = y;
     this._timer = 0;
     this.free = false;
-    
+
     // Create smaller burst of particles (fewer for more compact effect)
     const particleCount = Math.floor(Math.random() * 6) + 8; // 8-14 particles
     this._particles = [];
-    
+
     for (let i = 0; i < particleCount; i++) {
       this._particles.push(new ExplosionParticle(this.game, x, y));
     }
