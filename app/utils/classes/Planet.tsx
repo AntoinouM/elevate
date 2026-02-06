@@ -82,16 +82,25 @@ class Planet extends GameObject {
   }
 
   getSpeedCoefficient(playerPositionPercentage: number): number {
+    // Smooth scaling based on height percentage
+    // Base multiplier increases gradually with height
     let multiplyingFactor;
 
-    if (playerPositionPercentage > 92) {
-      multiplyingFactor = 4 + 2 * (playerPositionPercentage * 0.01);
+    if (playerPositionPercentage > 90) {
+      // Very high: exponential increase for extreme challenge
+      multiplyingFactor = 3.5 + (playerPositionPercentage - 90) * 0.15;
     } else if (playerPositionPercentage > 75) {
-      multiplyingFactor = 2;
-    } else if (playerPositionPercentage > 45) {
-      multiplyingFactor = 1.4;
+      // High: significant increase
+      multiplyingFactor = 2.2 + (playerPositionPercentage - 75) * 0.08;
+    } else if (playerPositionPercentage > 50) {
+      // Medium-high: moderate increase
+      multiplyingFactor = 1.5 + (playerPositionPercentage - 50) * 0.028;
+    } else if (playerPositionPercentage > 25) {
+      // Medium: slight increase
+      multiplyingFactor = 1.2 + (playerPositionPercentage - 25) * 0.012;
     } else {
-      multiplyingFactor = 1;
+      // Low: base speed with minimal scaling
+      multiplyingFactor = 1 + playerPositionPercentage * 0.008;
     }
 
     return multiplyingFactor;

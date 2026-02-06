@@ -10,7 +10,7 @@ import Player from './Player';
 const states = {
   BEFORE: 0,
   ONGOING: 1,
-  ENDED: 2,
+  OVER: 2,
 };
 
 class GameStates {
@@ -74,7 +74,7 @@ class GameOnGoing extends GameStates {
     this._cloudContainer1 = this.createCloud();
     this._planetCounter = randomNumberBetween(
       this.game.config.PLANET.planetMinInterval,
-      this.game.config.PLANET.planetMaxInterval
+      this.game.config.PLANET.planetMaxInterval,
     );
 
     this.init();
@@ -127,7 +127,7 @@ class GameOnGoing extends GameStates {
       if (planet.free || !this.objectAreColliding(this.game.player, planet))
         return;
       const explosion = poolFunctions.getFirstFreeElementFromPool<Explosion>(
-        this.explosionsPool
+        this.explosionsPool,
       );
       if (explosion) {
         explosion.activate(planet.position.x, planet.position.y);
@@ -137,18 +137,20 @@ class GameOnGoing extends GameStates {
       planet.reset();
     });
 
-    // create periodically planets
+    // create periodically planets with dynamic intervals
     this.planetCounter -= timeStamp;
     if (this.planetCounter <= 0) {
-      this.planetCounter = randomNumberBetween(
-        this.game.config.PLANET.planetMinInterval,
-        this.game.config.PLANET.planetMaxInterval
-      );
+      // Use dynamic spawn interval based on height and safety
+      this.planetCounter = this.getSpawnInterval();
       this.spawnPlanetObjects();
     }
 
-    // randomized x with player position
-    // use this,planetcounter to spawn planet and reset it to random
+    // Safety spawn: if player is falling and no reachable planet, force spawn
+    if (this.game.player.verticalForce > 0 && !this.hasReachablePlanet()) {
+      if (this.planetCounter > 200) {
+        this.planetCounter = 200; // Force spawn very soon
+      }
+    }
   }
 
   render() {
@@ -185,7 +187,7 @@ class GameOnGoing extends GameStates {
 
   generateExplosion(planet: Planet) {
     const explosion = poolFunctions.getFirstFreeElementFromPool<Explosion>(
-      this.explosionsPool
+      this.explosionsPool,
     );
     if (explosion) {
       explosion.activate(planet.position.x, planet.position.y);
@@ -195,7 +197,7 @@ class GameOnGoing extends GameStates {
 
   updateGameObjects(
     gameObjectsMap: Map<string, GameObject>,
-    timeStamp: number
+    timeStamp: number,
   ) {
     gameObjectsMap.forEach((obj) => {
       if (obj instanceof Planet || obj instanceof Explosion) {
@@ -239,9 +241,63 @@ class GameOnGoing extends GameStates {
 
   spawnPlanetObjects() {
     const planet = poolFunctions.getFirstFreeElementFromPool<Planet>(
-      this.collectiblesPool
+      this.collectiblesPool,
     );
     planet?.activate();
+  }
+
+  hasReachablePlanet(): boolean {
+    // Calculate player's maximum jump height
+    const impulseForce = this.game.config.impulseForce;
+    const gravity = Math.abs(this.game.config.gravity);
+    const maxJumpHeight = (impulseForce * impulseForce) / (2 * gravity);
+
+    // Reduce reachable distance by 20% to trigger safety spawning earlier (easier)
+    const reducedJumpHeight = maxJumpHeight * 0.8;
+    
+    // Add margin for safety
+    const reachableMinY = this.game.player.position.y - reducedJumpHeight - 100;
+    const reachableMaxY = this.game.player.position.y + 200; // Include falling distance
+
+    // Check if any active planet is within vertical reach
+    return this.collectiblesPool.some((planet) => {
+      if (planet.free) return false;
+      return (
+        planet.position.y >= reachableMinY && planet.position.y <= reachableMaxY
+      );
+    });
+  }
+
+  getSpawnInterval(): number {
+    const heightPercent = this.game.player.positionYPercent;
+    const baseMin = this.game.config.PLANET.planetMinInterval;
+    const baseMax = this.game.config.PLANET.planetMaxInterval;
+
+    // Adjust spawn intervals based on height
+    let minInterval = baseMin;
+    let maxInterval = baseMax;
+
+    if (heightPercent > 75) {
+      // High altitude: spawn much more frequently
+      minInterval = baseMin * 0.4; // 400ms
+      maxInterval = baseMax * 0.5; // 1100ms
+    } else if (heightPercent > 50) {
+      // Medium altitude: spawn moderately more
+      minInterval = baseMin * 0.6; // 600ms
+      maxInterval = baseMax * 0.7; // 1540ms
+    } else if (heightPercent > 25) {
+      // Low-medium altitude: spawn slightly more
+      minInterval = baseMin * 0.8; // 800ms
+      maxInterval = baseMax * 0.85; // 1870ms
+    }
+
+    // Safety check: if no reachable planet, reduce interval significantly
+    if (!this.hasReachablePlanet()) {
+      minInterval *= 0.3; // Emergency spawn
+      maxInterval *= 0.3;
+    }
+
+    return randomNumberBetween(minInterval, maxInterval);
   }
 
   createCloud() {
@@ -258,7 +314,7 @@ class GameOnGoing extends GameStates {
       randomNumberBetween(minX, maxX),
       randomNumberBetween(minY, maxY),
       75,
-      this.game
+      this.game,
     );
   }
 
@@ -270,7 +326,7 @@ class GameOnGoing extends GameStates {
       this.gameObjects,
       this.game.config.PLANET.diameter,
       this.game.config.PLANET.diameter,
-      this.game
+      this.game,
     );
     poolFunctions.createPool(
       this.game.config.PLANET.maximum,
@@ -279,7 +335,7 @@ class GameOnGoing extends GameStates {
       this.gameObjects,
       this.game.config.PLANET.diameter,
       this.game.config.PLANET.diameter,
-      this.game
+      this.game,
     );
   }
 }
