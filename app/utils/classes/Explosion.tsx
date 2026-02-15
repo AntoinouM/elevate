@@ -8,7 +8,7 @@ class Explosion extends GameObject {
   _particles: ExplosionParticle[];
   _timer: number;
   _free: boolean;
-  _maxLifetime: number = 600; // Maximum lifetime in ms
+  _maxLifetime: number = 400; // Maximum lifetime in ms
 
   constructor(width: number, height: number, game: Game) {
     super(width, height, game);
